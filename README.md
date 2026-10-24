@@ -34,6 +34,7 @@ cd mobile && flutter run
 - [docs/PROGRESS.md](docs/PROGRESS.md) — статус функций и результаты проверок.
 - [docs/OPERATIONS.md](docs/OPERATIONS.md) — секреты, миграции, резервное копирование, требования к серверу.
 - [docs/ACCEPTANCE.md](docs/ACCEPTANCE.md) — соответствие договору и ТЗ, сценарий демонстрации, чек-лист приёмки.
+- [docs/CLIENT_DECISIONS.md](docs/CLIENT_DECISIONS.md) — вопросы для письменного согласования с заказчиком.
 
 ## Что входит и не входит в этап 1
 
