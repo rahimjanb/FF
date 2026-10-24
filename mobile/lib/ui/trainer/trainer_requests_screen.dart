@@ -68,29 +68,12 @@ class TrainerRequestsScreen extends StatelessWidget {
     Future<void> Function() reload,
   ) async {
     final t = AppLocalizations.of(context);
-    final controller = TextEditingController();
-    final confirmed = await showDialog<bool>(
+    // Null when cancelled, otherwise the (possibly empty) comment.
+    final comment = await showDialog<String>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(accept ? t.accept : t.reject),
-        content: TextField(
-          controller: controller,
-          maxLength: 500,
-          decoration: InputDecoration(hintText: t.commentOptional),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(t.cancel)),
-          FilledButton(
-            style: FilledButton.styleFrom(minimumSize: const Size(100, 44)),
-            onPressed: () => Navigator.pop(ctx, true),
-            child: Text(t.confirm),
-          ),
-        ],
-      ),
+      builder: (_) => _RespondDialog(accept: accept),
     );
-    final comment = controller.text.trim();
-    controller.dispose();
-    if (confirmed != true || !context.mounted) return;
+    if (comment == null || !context.mounted) return;
     try {
       await repo.respond(r.id, accept: accept, comment: comment.isEmpty ? null : comment);
       if (context.mounted) showSnack(context, accept ? t.requestAccepted : t.requestRejected);
@@ -98,6 +81,46 @@ class TrainerRequestsScreen extends StatelessWidget {
       if (context.mounted) showSnack(context, errorText(t, e));
     }
     await reload();
+  }
+}
+
+/// Owns its text controller, so it is disposed only after the dialog's closing animation has finished.
+class _RespondDialog extends StatefulWidget {
+  const _RespondDialog({required this.accept});
+  final bool accept;
+
+  @override
+  State<_RespondDialog> createState() => _RespondDialogState();
+}
+
+class _RespondDialogState extends State<_RespondDialog> {
+  final _comment = TextEditingController();
+
+  @override
+  void dispose() {
+    _comment.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    return AlertDialog(
+      title: Text(widget.accept ? t.accept : t.reject),
+      content: TextField(
+        controller: _comment,
+        maxLength: 500,
+        decoration: InputDecoration(hintText: t.commentOptional),
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: Text(t.cancel)),
+        FilledButton(
+          style: FilledButton.styleFrom(minimumSize: const Size(100, 44)),
+          onPressed: () => Navigator.pop(context, _comment.text.trim()),
+          child: Text(t.confirm),
+        ),
+      ],
+    );
   }
 }
 

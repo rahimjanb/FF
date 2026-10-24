@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:fitness_formulasi/ui/client/trainers_screen.dart';
 import 'package:fitness_formulasi/ui/client/workouts_screen.dart';
+import 'package:fitness_formulasi/ui/trainer/trainer_requests_screen.dart';
 import 'package:fitness_formulasi/ui/trainer/trainer_schedule_screen.dart';
 import 'package:fitness_formulasi/ui/trainer/trainer_shell.dart';
 import 'package:flutter/material.dart';
@@ -382,5 +385,53 @@ void main() {
     await settle(tester);
     expect(find.text('Входящие заявки').hitTestable(), findsOneWidget);
     expect(find.text('Новая тренировка').hitTestable(), findsNothing);
+  });
+
+  testWidgets('responding to a request: comment is sent and the dialog closes without errors', (tester) async {
+    final b = FakeBackend();
+    var status = 'Pending';
+    String? sentComment;
+    b.routes['/api/trainer/requests'] = (_) => paged([
+      {
+        'id': 'r1',
+        'status': status,
+        'message': 'Хочу заниматься',
+        'responseComment': null,
+        'createdAt': now.toUtc().toIso8601String(),
+        'respondedAt': null,
+        'trainer': {'id': 't1', 'firstName': 'Dilshod', 'lastName': 'Rashidov'},
+        'client': {'id': 'c1', 'firstName': 'Aziz', 'lastName': 'Karimov'},
+      },
+    ]);
+    b.routes['/api/trainer/requests/r1/reject'] = (req) {
+      sentComment = (jsonDecode(req.body) as Map<String, dynamic>)['comment'] as String?;
+      status = 'Rejected';
+      return <String, dynamic>{};
+    };
+    await pumpScreen(tester, const TrainerRequestsScreen(), role: 'Trainer', backend: b);
+
+    // Cancel: nothing is sent; step through the closing animation frame by frame.
+    await tester.tap(find.widgetWithText(OutlinedButton, 'Отклонить').first.hitTestable());
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'черновик');
+    await tester.tap(find.text('Отмена'));
+    for (var i = 0; i < 20; i++) {
+      await tester.pump(const Duration(milliseconds: 16));
+    }
+    expect(tester.takeException(), isNull);
+    expect(b.calls['/api/trainer/requests/r1/reject'], isNull);
+
+    // Confirm with a comment.
+    await tester.tap(find.widgetWithText(OutlinedButton, 'Отклонить').first.hitTestable());
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), '  Нет свободных мест  ');
+    await tester.tap(find.text('Подтвердить'));
+    for (var i = 0; i < 20; i++) {
+      await tester.pump(const Duration(milliseconds: 16));
+    }
+    await settle(tester);
+    expect(tester.takeException(), isNull);
+    expect(sentComment, 'Нет свободных мест');
+    expect(find.text('Отклонена'), findsWidgets);
   });
 }
