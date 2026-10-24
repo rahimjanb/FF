@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/config.dart';
 import '../../data/models.dart';
 import '../../data/repositories.dart';
 import '../../l10n/gen/app_localizations.dart';
@@ -101,7 +102,7 @@ class _TrainerTile extends StatelessWidget {
       onTap: onTap,
       child: Row(
         children: [
-          TrainerAvatar(name: trainer.firstName),
+          TrainerAvatar(name: trainer.firstName, photoUrl: trainer.photoUrl),
           const SizedBox(width: 14),
           Expanded(
             child: Column(
@@ -130,14 +131,19 @@ class _TrainerTile extends StatelessWidget {
 }
 
 class TrainerAvatar extends StatelessWidget {
-  const TrainerAvatar({super.key, required this.name, this.radius = 26});
+  const TrainerAvatar({super.key, required this.name, this.radius = 26, this.photoUrl});
   final String name;
   final double radius;
+
+  /// Photo path from the API; the initial stays visible while it loads or if it fails.
+  final String? photoUrl;
 
   @override
   Widget build(BuildContext context) => CircleAvatar(
     radius: radius,
     backgroundColor: AppColors.accent.withValues(alpha: 0.15),
+    foregroundImage: photoUrl == null ? null : NetworkImage(AppConfig.resolve(photoUrl!)),
+    onForegroundImageError: photoUrl == null ? null : (_, _) {},
     child: Text(
       name.isEmpty ? '?' : name.characters.first.toUpperCase(),
       style: TextStyle(color: AppColors.accent, fontWeight: FontWeight.w700, fontSize: radius * 0.75),
@@ -213,7 +219,7 @@ class _TrainerSheetState extends State<TrainerSheet> {
             const SizedBox(height: 20),
             Row(
               children: [
-                TrainerAvatar(name: tr.firstName, radius: 34),
+                TrainerAvatar(name: tr.firstName, radius: 34, photoUrl: tr.photoUrl),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(

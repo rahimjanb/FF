@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { api, qs } from '../api/client'
+import { api, apiUrl, qs } from '../api/client'
 import type { Paged, Trainer, UserStatus } from '../api/types'
 import { Badge, Button, DataState, ErrorBanner, Field, Modal, PageHeader, Pagination } from '../components/ui'
 import { fullName } from '../lib/format'
@@ -30,7 +30,7 @@ export function TrainersPage() {
               <tbody>
                 {data.items.map(t => (
                   <tr key={t.id}>
-                    <td>{fullName(t)}</td>
+                    <td><span className="person"><TrainerPhoto trainer={t} />{fullName(t)}</span></td>
                     <td>{t.phone}</td>
                     <td>{t.specialization ?? '—'}</td>
                     <td>{t.clientsCount}</td>
@@ -48,13 +48,15 @@ export function TrainersPage() {
           </>
         )}
       </DataState>
-      {editing && <TrainerModal trainer={editing === 'new' ? null : editing} onClose={() => setEditing(null)} onSaved={() => { setEditing(null); reload() }} />}
+      {editing && <TrainerModal trainer={editing === 'new' ? null : editing} onClose={() => setEditing(null)} onSaved={() => { setEditing(null); reload() }} onPhotoChanged={reload} />}
       {resetting && <ResetPasswordModal url={`/api/admin/trainers/${resetting.id}/reset-password`} onClose={() => setResetting(null)} />}
     </>
   )
 }
 
-function TrainerModal({ trainer, onClose, onSaved }: { trainer: Trainer | null; onClose(): void; onSaved(): void }) {
+function TrainerModal({ trainer, onClose, onSaved, onPhotoChanged }: {
+  trainer: Trainer | null; onClose(): void; onSaved(): void; onPhotoChanged(): void
+}) {
   const [form, setForm] = useState({
     phone: trainer?.phone ?? '', password: '', firstName: trainer?.firstName ?? '', lastName: trainer?.lastName ?? '',
     specialization: trainer?.specialization ?? '', bio: trainer?.bio ?? '', experienceYears: String(trainer?.experienceYears ?? ''),
@@ -93,6 +95,7 @@ function TrainerModal({ trainer, onClose, onSaved }: { trainer: Trainer | null; 
           <Field label="Имя" error={errors.firstName}><input value={form.firstName} onChange={set('firstName')} required maxLength={64} /></Field>
           <Field label="Фамилия" error={errors.lastName}><input value={form.lastName} onChange={set('lastName')} required maxLength={64} /></Field>
         </div>
+        {trainer && <PhotoField trainer={trainer} onChanged={onPhotoChanged} />}
         <Field label="Телефон (логин)" error={errors.phone}><input value={form.phone} onChange={set('phone')} required /></Field>
         {!trainer && (
           <Field label="Временный пароль" error={errors.password} hint="Не менее 8 символов, буквы и цифры. При первом входе тренер задаст свой пароль.">
@@ -119,5 +122,54 @@ function TrainerModal({ trainer, onClose, onSaved }: { trainer: Trainer | null; 
         </div>
       </form>
     </Modal>
+  )
+}
+
+function TrainerPhoto({ trainer, size = 32 }: { trainer: Trainer; size?: number }) {
+  return trainer.photoUrl
+    ? <img className="avatar" src={apiUrl(trainer.photoUrl)} alt="" width={size} height={size} />
+    : <span className="avatar avatar-empty" style={{ width: size, height: size }}>{trainer.firstName.charAt(0)}</span>
+}
+
+/** Photo is saved immediately on upload or removal, separately from the form fields. */
+function PhotoField({ trainer, onChanged }: { trainer: Trainer; onChanged(): void }) {
+  const [current, setCurrent] = useState(trainer)
+  const [error, setError] = useState<string | null>(null)
+  const [busy, setBusy] = useState(false)
+
+  async function run(call: () => Promise<Trainer>) {
+    setBusy(true); setError(null)
+    try { setCurrent(await call()); onChanged() } catch (err) { setError(errorMessage(err)) } finally { setBusy(false) }
+  }
+
+  function upload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    if (file.size > 2 * 1024 * 1024) { setError('Фото должно быть не больше 2 МБ.'); return }
+    const body = new FormData()
+    body.append('file', file)
+    void run(() => api<Trainer>(`/api/admin/trainers/${trainer.id}/photo`, { method: 'PUT', body }))
+  }
+
+  return (
+    // A div, not <Field>: Field is a <label>, which would forward every click inside it to the file input.
+    <div className="field">
+      <span className="field-label">Фото</span>
+      <div className="photo-field">
+        <TrainerPhoto trainer={current} size={64} />
+        <label className="btn btn-secondary">
+          {current.photoUrl ? 'Заменить' : 'Загрузить'}
+          <input type="file" accept="image/jpeg,image/png,image/webp" onChange={upload} disabled={busy} hidden />
+        </label>
+        {current.photoUrl && (
+          <Button type="button" variant="ghost" disabled={busy}
+            onClick={() => run(() => api<Trainer>(`/api/admin/trainers/${trainer.id}/photo`, { method: 'DELETE' }))}>
+            Удалить
+          </Button>
+        )}
+      </div>
+      {error ? <span className="field-error">{error}</span> : <span className="field-hint">JPEG, PNG или WebP до 2 МБ. Сохраняется сразу.</span>}
+    </div>
   )
 }

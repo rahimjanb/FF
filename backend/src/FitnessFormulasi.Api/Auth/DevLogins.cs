@@ -38,6 +38,9 @@ public sealed class DevLogins
             await db.SaveChangesAsync(ct);
             logger.LogInformation("Dev account {Login} ({Role}) created", a.Login, a.Role);
         }
+        // The dev administrator manages integrations so the settings screen can be tried locally.
+        await db.Users.Where(u => u.Phone == Accounts[0].Phone && !u.CanManageIntegrations)
+            .ExecuteUpdateAsync(s => s.SetProperty(u => u.CanManageIntegrations, true), ct);
     }
 }
 

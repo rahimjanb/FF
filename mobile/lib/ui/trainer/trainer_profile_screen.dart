@@ -76,7 +76,7 @@ class _TrainerProfileFormState extends State<_TrainerProfileForm> {
         AppCard(
           child: Row(
             children: [
-              TrainerAvatar(name: p.firstName, radius: 30),
+              TrainerAvatar(name: p.firstName, radius: 30, photoUrl: p.photoUrl),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(

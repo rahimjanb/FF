@@ -1183,6 +1183,402 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Показать ещё'**
   String get loadMore;
+
+  /// No description provided for @myMembership.
+  ///
+  /// In ru, this message translates to:
+  /// **'Мой абонемент'**
+  String get myMembership;
+
+  /// No description provided for @qrEntry.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вход'**
+  String get qrEntry;
+
+  /// No description provided for @soon.
+  ///
+  /// In ru, this message translates to:
+  /// **'скоро'**
+  String get soon;
+
+  /// No description provided for @statusInactive.
+  ///
+  /// In ru, this message translates to:
+  /// **'Неактивен'**
+  String get statusInactive;
+
+  /// No description provided for @noWorkoutsYet.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тренировок пока нет'**
+  String get noWorkoutsYet;
+
+  /// No description provided for @workoutsByTrainerHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тренировки назначает ваш тренер'**
+  String get workoutsByTrainerHint;
+
+  /// No description provided for @chooseTrainerForWorkoutsHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите тренера, чтобы получать тренировки'**
+  String get chooseTrainerForWorkoutsHint;
+
+  /// No description provided for @findYourTrainer.
+  ///
+  /// In ru, this message translates to:
+  /// **'Найдите своего тренера'**
+  String get findYourTrainer;
+
+  /// No description provided for @withTrainerShort.
+  ///
+  /// In ru, this message translates to:
+  /// **'С тренером {name}'**
+  String withTrainerShort(String name);
+
+  /// No description provided for @membershipPlansSubtitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выберите подходящий тариф'**
+  String get membershipPlansSubtitle;
+
+  /// No description provided for @membershipManageSubtitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Управление и история'**
+  String get membershipManageSubtitle;
+
+  /// No description provided for @plansInfo.
+  ///
+  /// In ru, this message translates to:
+  /// **'О тарифах'**
+  String get plansInfo;
+
+  /// No description provided for @plansInfoText.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тарифы и цены устанавливает клуб. Сейчас абонемент оформляется на ресепшене, онлайн-оплата появится позже.'**
+  String get plansInfoText;
+
+  /// No description provided for @monthsShort.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count} мес'**
+  String monthsShort(int count);
+
+  /// No description provided for @daysShortCount.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count} дн.'**
+  String daysShortCount(int count);
+
+  /// No description provided for @monthsCount.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{{count} месяц} few{{count} месяца} many{{count} месяцев} other{{count} месяца}}'**
+  String monthsCount(int count);
+
+  /// No description provided for @daysCount.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{{count} день} few{{count} дня} many{{count} дней} other{{count} дня}}'**
+  String daysCount(int count);
+
+  /// No description provided for @visitsCount.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count, plural, one{{count} посещение} few{{count} посещения} many{{count} посещений} other{{count} посещения}}'**
+  String visitsCount(int count);
+
+  /// No description provided for @perPeriod.
+  ///
+  /// In ru, this message translates to:
+  /// **'/ {period}'**
+  String perPeriod(String period);
+
+  /// No description provided for @currencySum.
+  ///
+  /// In ru, this message translates to:
+  /// **'сум'**
+  String get currencySum;
+
+  /// No description provided for @unlimitedVisits.
+  ///
+  /// In ru, this message translates to:
+  /// **'Безлимитные посещения'**
+  String get unlimitedVisits;
+
+  /// No description provided for @validForPeriod.
+  ///
+  /// In ru, this message translates to:
+  /// **'Действует {period}'**
+  String validForPeriod(String period);
+
+  /// No description provided for @paymentMethod.
+  ///
+  /// In ru, this message translates to:
+  /// **'Способ оплаты'**
+  String get paymentMethod;
+
+  /// No description provided for @paymentMethodValue.
+  ///
+  /// In ru, this message translates to:
+  /// **'Банковская карта'**
+  String get paymentMethodValue;
+
+  /// No description provided for @totalFor.
+  ///
+  /// In ru, this message translates to:
+  /// **'Итого за {period}'**
+  String totalFor(String period);
+
+  /// No description provided for @checkoutPlan.
+  ///
+  /// In ru, this message translates to:
+  /// **'Оформить «{plan}»'**
+  String checkoutPlan(String plan);
+
+  /// No description provided for @alsoAtReception.
+  ///
+  /// In ru, this message translates to:
+  /// **'Также можно оформить на ресепшене клуба'**
+  String get alsoAtReception;
+
+  /// No description provided for @onlinePaymentSoon.
+  ///
+  /// In ru, this message translates to:
+  /// **'Онлайн-оплата скоро будет доступна. Пока абонемент можно оформить на ресепшене клуба.'**
+  String get onlinePaymentSoon;
+
+  /// No description provided for @noPlansTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Тарифы пока не опубликованы'**
+  String get noPlansTitle;
+
+  /// No description provided for @noPlansHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Уточните стоимость на ресепшене клуба'**
+  String get noPlansHint;
+
+  /// No description provided for @statusExpiring.
+  ///
+  /// In ru, this message translates to:
+  /// **'Скоро истекает'**
+  String get statusExpiring;
+
+  /// No description provided for @ofTotal.
+  ///
+  /// In ru, this message translates to:
+  /// **'из {total}'**
+  String ofTotal(int total);
+
+  /// No description provided for @validTillLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Действует до'**
+  String get validTillLabel;
+
+  /// No description provided for @ownerLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Владелец'**
+  String get ownerLabel;
+
+  /// No description provided for @numberLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Номер'**
+  String get numberLabel;
+
+  /// No description provided for @showQrPass.
+  ///
+  /// In ru, this message translates to:
+  /// **'Показать QR-пропуск'**
+  String get showQrPass;
+
+  /// No description provided for @actionFreeze.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заморозить'**
+  String get actionFreeze;
+
+  /// No description provided for @actionRenew.
+  ///
+  /// In ru, this message translates to:
+  /// **'Продлить'**
+  String get actionRenew;
+
+  /// No description provided for @actionGuest.
+  ///
+  /// In ru, this message translates to:
+  /// **'Гость'**
+  String get actionGuest;
+
+  /// No description provided for @actionChangePlan.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сменить'**
+  String get actionChangePlan;
+
+  /// No description provided for @includedTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Включено в абонемент'**
+  String get includedTitle;
+
+  /// No description provided for @startLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Начало'**
+  String get startLabel;
+
+  /// No description provided for @usedOfLimit.
+  ///
+  /// In ru, this message translates to:
+  /// **'{used} из {limit}'**
+  String usedOfLimit(int used, int limit);
+
+  /// No description provided for @historyEmpty.
+  ///
+  /// In ru, this message translates to:
+  /// **'Здесь появятся прошлые абонементы'**
+  String get historyEmpty;
+
+  /// No description provided for @more.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ещё'**
+  String get more;
+
+  /// No description provided for @menuContract.
+  ///
+  /// In ru, this message translates to:
+  /// **'Договор'**
+  String get menuContract;
+
+  /// No description provided for @menuRules.
+  ///
+  /// In ru, this message translates to:
+  /// **'Правила клуба'**
+  String get menuRules;
+
+  /// No description provided for @menuSupport.
+  ///
+  /// In ru, this message translates to:
+  /// **'Поддержка'**
+  String get menuSupport;
+
+  /// No description provided for @perMonth.
+  ///
+  /// In ru, this message translates to:
+  /// **'/ мес'**
+  String get perMonth;
+
+  /// No description provided for @editProfile.
+  ///
+  /// In ru, this message translates to:
+  /// **'Редактировать профиль'**
+  String get editProfile;
+
+  /// No description provided for @phoneStatusConfirmed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подтверждён'**
+  String get phoneStatusConfirmed;
+
+  /// No description provided for @phoneStatusNotConfirmed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не подтверждён'**
+  String get phoneStatusNotConfirmed;
+
+  /// No description provided for @phoneChangeHintShort.
+  ///
+  /// In ru, this message translates to:
+  /// **'Номер меняется через администратора клуба'**
+  String get phoneChangeHintShort;
+
+  /// No description provided for @statVisits.
+  ///
+  /// In ru, this message translates to:
+  /// **'Посещений'**
+  String get statVisits;
+
+  /// No description provided for @memberSince.
+  ///
+  /// In ru, this message translates to:
+  /// **'В клубе с'**
+  String get memberSince;
+
+  /// No description provided for @filledOf.
+  ///
+  /// In ru, this message translates to:
+  /// **'{filled} из {total} заполнено'**
+  String filledOf(int filled, int total);
+
+  /// No description provided for @addEmail.
+  ///
+  /// In ru, this message translates to:
+  /// **'Добавить email'**
+  String get addEmail;
+
+  /// No description provided for @settings.
+  ///
+  /// In ru, this message translates to:
+  /// **'Настройки'**
+  String get settings;
+
+  /// No description provided for @faceIdLogin.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вход по Face ID'**
+  String get faceIdLogin;
+
+  /// No description provided for @logoutAccount.
+  ///
+  /// In ru, this message translates to:
+  /// **'Выйти из аккаунта'**
+  String get logoutAccount;
+
+  /// No description provided for @appVersion.
+  ///
+  /// In ru, this message translates to:
+  /// **'Fitness Formula · версия {version}'**
+  String appVersion(String version);
+
+  /// No description provided for @editTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Редактирование'**
+  String get editTitle;
+
+  /// No description provided for @done.
+  ///
+  /// In ru, this message translates to:
+  /// **'Готово'**
+  String get done;
+
+  /// No description provided for @changePhoto.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сменить фото'**
+  String get changePhoto;
+
+  /// No description provided for @photoSoon.
+  ///
+  /// In ru, this message translates to:
+  /// **'Смена фото скоро будет доступна'**
+  String get photoSoon;
+
+  /// No description provided for @languageName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Русский'**
+  String get languageName;
 }
 
 class _AppLocalizationsDelegate

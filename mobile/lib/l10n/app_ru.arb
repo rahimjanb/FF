@@ -309,5 +309,175 @@
   "errorSessionNotScheduled": "Тренировка уже отмечена или отменена",
   "errorSessionNotStarted": "Отметить проведённой можно только после начала тренировки",
   "errorNotFound": "Запись не найдена или недоступна",
-  "loadMore": "Показать ещё"
+  "loadMore": "Показать ещё",
+  "myMembership": "Мой абонемент",
+  "qrEntry": "Вход",
+  "soon": "скоро",
+  "statusInactive": "Неактивен",
+  "noWorkoutsYet": "Тренировок пока нет",
+  "workoutsByTrainerHint": "Тренировки назначает ваш тренер",
+  "chooseTrainerForWorkoutsHint": "Выберите тренера, чтобы получать тренировки",
+  "findYourTrainer": "Найдите своего тренера",
+  "withTrainerShort": "С тренером {name}",
+  "@withTrainerShort": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "membershipPlansSubtitle": "Выберите подходящий тариф",
+  "membershipManageSubtitle": "Управление и история",
+  "plansInfo": "О тарифах",
+  "plansInfoText": "Тарифы и цены устанавливает клуб. Сейчас абонемент оформляется на ресепшене, онлайн-оплата появится позже.",
+  "monthsShort": "{count} мес",
+  "@monthsShort": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "daysShortCount": "{count} дн.",
+  "@daysShortCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "monthsCount": "{count, plural, one{{count} месяц} few{{count} месяца} many{{count} месяцев} other{{count} месяца}}",
+  "@monthsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "daysCount": "{count, plural, one{{count} день} few{{count} дня} many{{count} дней} other{{count} дня}}",
+  "@daysCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "visitsCount": "{count, plural, one{{count} посещение} few{{count} посещения} many{{count} посещений} other{{count} посещения}}",
+  "@visitsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "perPeriod": "/ {period}",
+  "@perPeriod": {
+    "placeholders": {
+      "period": {
+        "type": "String"
+      }
+    }
+  },
+  "currencySum": "сум",
+  "unlimitedVisits": "Безлимитные посещения",
+  "validForPeriod": "Действует {period}",
+  "@validForPeriod": {
+    "placeholders": {
+      "period": {
+        "type": "String"
+      }
+    }
+  },
+  "paymentMethod": "Способ оплаты",
+  "paymentMethodValue": "Банковская карта",
+  "totalFor": "Итого за {period}",
+  "@totalFor": {
+    "placeholders": {
+      "period": {
+        "type": "String"
+      }
+    }
+  },
+  "checkoutPlan": "Оформить «{plan}»",
+  "@checkoutPlan": {
+    "placeholders": {
+      "plan": {
+        "type": "String"
+      }
+    }
+  },
+  "alsoAtReception": "Также можно оформить на ресепшене клуба",
+  "onlinePaymentSoon": "Онлайн-оплата скоро будет доступна. Пока абонемент можно оформить на ресепшене клуба.",
+  "noPlansTitle": "Тарифы пока не опубликованы",
+  "noPlansHint": "Уточните стоимость на ресепшене клуба",
+  "statusExpiring": "Скоро истекает",
+  "ofTotal": "из {total}",
+  "@ofTotal": {
+    "placeholders": {
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "validTillLabel": "Действует до",
+  "ownerLabel": "Владелец",
+  "numberLabel": "Номер",
+  "showQrPass": "Показать QR-пропуск",
+  "actionFreeze": "Заморозить",
+  "actionRenew": "Продлить",
+  "actionGuest": "Гость",
+  "actionChangePlan": "Сменить",
+  "includedTitle": "Включено в абонемент",
+  "startLabel": "Начало",
+  "usedOfLimit": "{used} из {limit}",
+  "@usedOfLimit": {
+    "placeholders": {
+      "used": {
+        "type": "int"
+      },
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
+  "historyEmpty": "Здесь появятся прошлые абонементы",
+  "more": "Ещё",
+  "menuContract": "Договор",
+  "menuRules": "Правила клуба",
+  "menuSupport": "Поддержка",
+  "perMonth": "/ мес",
+  "editProfile": "Редактировать профиль",
+  "phoneStatusConfirmed": "Подтверждён",
+  "phoneStatusNotConfirmed": "Не подтверждён",
+  "phoneChangeHintShort": "Номер меняется через администратора клуба",
+  "statVisits": "Посещений",
+  "memberSince": "В клубе с",
+  "filledOf": "{filled} из {total} заполнено",
+  "@filledOf": {
+    "placeholders": {
+      "filled": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "addEmail": "Добавить email",
+  "settings": "Настройки",
+  "faceIdLogin": "Вход по Face ID",
+  "logoutAccount": "Выйти из аккаунта",
+  "appVersion": "Fitness Formula · версия {version}",
+  "@appVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "editTitle": "Редактирование",
+  "done": "Готово",
+  "changePhoto": "Сменить фото",
+  "photoSoon": "Смена фото скоро будет доступна",
+  "languageName": "Русский"
 }

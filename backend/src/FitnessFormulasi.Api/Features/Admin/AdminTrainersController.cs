@@ -102,6 +102,48 @@ public class AdminTrainersController(AppDbContext db, AuthService auth, TokenSer
         return await Get(id, ct);
     }
 
+    public const int MaxPhotoBytes = 2 * 1024 * 1024;
+
+    /// <summary>Sets the trainer photo (JPEG, PNG or WebP up to 2 MB). The format is checked by content, not by name.</summary>
+    [HttpPut("{id:guid}/photo")]
+    [Consumes("multipart/form-data")]
+    [RequestSizeLimit(MaxPhotoBytes + 64 * 1024)]
+    public async Task<TrainerAdminDto> SetPhoto(Guid id, IFormFile file, CancellationToken ct)
+    {
+        var trainer = await db.TrainerProfiles.SingleOrDefaultAsync(t => t.Id == id, ct) ?? throw ApiException.NotFound("Trainer");
+        if (file.Length == 0 || file.Length > MaxPhotoBytes)
+            throw ApiException.BadRequest("photo_too_large", "The photo must be up to 2 MB.");
+        using var buffer = new MemoryStream();
+        await file.CopyToAsync(buffer, ct);
+        var data = buffer.ToArray();
+        var type = ImageType(data) ?? throw ApiException.BadRequest("photo_invalid_format", "Only JPEG, PNG or WebP images are accepted.");
+
+        var photo = await db.TrainerPhotos.SingleOrDefaultAsync(p => p.TrainerProfileId == id, ct);
+        if (photo is null) db.TrainerPhotos.Add(new TrainerPhoto { TrainerProfileId = id, Data = data, ContentType = type });
+        else (photo.Data, photo.ContentType) = (data, type);
+        trainer.PhotoVersion++;
+        await db.SaveChangesAsync(ct);
+        return await Get(id, ct);
+    }
+
+    [HttpDelete("{id:guid}/photo")]
+    public async Task<TrainerAdminDto> DeletePhoto(Guid id, CancellationToken ct)
+    {
+        var trainer = await db.TrainerProfiles.SingleOrDefaultAsync(t => t.Id == id, ct) ?? throw ApiException.NotFound("Trainer");
+        await db.TrainerPhotos.Where(p => p.TrainerProfileId == id).ExecuteDeleteAsync(ct);
+        trainer.PhotoVersion = 0;
+        await db.SaveChangesAsync(ct);
+        return await Get(id, ct);
+    }
+
+    private static string? ImageType(byte[] d) => d switch
+    {
+        [0xFF, 0xD8, 0xFF, ..] => "image/jpeg",
+        [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, ..] => "image/png",
+        [0x52, 0x49, 0x46, 0x46, _, _, _, _, 0x57, 0x45, 0x42, 0x50, ..] => "image/webp",
+        _ => null,
+    };
+
     [HttpPost("{id:guid}/reset-password")]
     public async Task<IActionResult> ResetPassword(Guid id, ResetPasswordRequest req, CancellationToken ct)
     {

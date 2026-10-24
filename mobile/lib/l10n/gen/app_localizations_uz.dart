@@ -609,4 +609,235 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get loadMore => 'Yana ko‘rsatish';
+
+  @override
+  String get myMembership => 'Abonementim';
+
+  @override
+  String get qrEntry => 'Kirish';
+
+  @override
+  String get soon => 'tez orada';
+
+  @override
+  String get statusInactive => 'Faol emas';
+
+  @override
+  String get noWorkoutsYet => 'Hozircha mashg‘ulotlar yo‘q';
+
+  @override
+  String get workoutsByTrainerHint => 'Mashg‘ulotlarni treneringiz belgilaydi';
+
+  @override
+  String get chooseTrainerForWorkoutsHint =>
+      'Mashg‘ulot olish uchun trener tanlang';
+
+  @override
+  String get findYourTrainer => 'O‘z treneringizni toping';
+
+  @override
+  String withTrainerShort(String name) {
+    return 'Trener: $name';
+  }
+
+  @override
+  String get membershipPlansSubtitle => 'Mos tarifni tanlang';
+
+  @override
+  String get membershipManageSubtitle => 'Boshqaruv va tarix';
+
+  @override
+  String get plansInfo => 'Tariflar haqida';
+
+  @override
+  String get plansInfoText =>
+      'Tariflar va narxlarni klub belgilaydi. Hozircha abonement qabulxonada rasmiylashtiriladi, onlayn to‘lov keyinroq qo‘shiladi.';
+
+  @override
+  String monthsShort(int count) {
+    return '$count oy';
+  }
+
+  @override
+  String daysShortCount(int count) {
+    return '$count kun';
+  }
+
+  @override
+  String monthsCount(int count) {
+    return '$count oy';
+  }
+
+  @override
+  String daysCount(int count) {
+    return '$count kun';
+  }
+
+  @override
+  String visitsCount(int count) {
+    return '$count ta tashrif';
+  }
+
+  @override
+  String perPeriod(String period) {
+    return '/ $period';
+  }
+
+  @override
+  String get currencySum => 'so‘m';
+
+  @override
+  String get unlimitedVisits => 'Cheksiz tashriflar';
+
+  @override
+  String validForPeriod(String period) {
+    return '$period amal qiladi';
+  }
+
+  @override
+  String get paymentMethod => 'To‘lov usuli';
+
+  @override
+  String get paymentMethodValue => 'Bank kartasi';
+
+  @override
+  String totalFor(String period) {
+    return 'Jami, $period';
+  }
+
+  @override
+  String checkoutPlan(String plan) {
+    return '«$plan» ni rasmiylashtirish';
+  }
+
+  @override
+  String get alsoAtReception =>
+      'Klub qabulxonasida ham rasmiylashtirish mumkin';
+
+  @override
+  String get onlinePaymentSoon =>
+      'Onlayn to‘lov tez orada ishga tushadi. Hozircha abonementni klub qabulxonasida rasmiylashtirish mumkin.';
+
+  @override
+  String get noPlansTitle => 'Tariflar hali e’lon qilinmagan';
+
+  @override
+  String get noPlansHint => 'Narxni klub qabulxonasidan so‘rang';
+
+  @override
+  String get statusExpiring => 'Tez orada tugaydi';
+
+  @override
+  String ofTotal(int total) {
+    return '$total dan';
+  }
+
+  @override
+  String get validTillLabel => 'Amal qiladi';
+
+  @override
+  String get ownerLabel => 'Egasi';
+
+  @override
+  String get numberLabel => 'Raqami';
+
+  @override
+  String get showQrPass => 'QR-ruxsatnoma';
+
+  @override
+  String get actionFreeze => 'Muzlatish';
+
+  @override
+  String get actionRenew => 'Uzaytirish';
+
+  @override
+  String get actionGuest => 'Mehmon';
+
+  @override
+  String get actionChangePlan => 'Almashtirish';
+
+  @override
+  String get includedTitle => 'Abonement tarkibi';
+
+  @override
+  String get startLabel => 'Boshlanishi';
+
+  @override
+  String usedOfLimit(int used, int limit) {
+    return '$used / $limit';
+  }
+
+  @override
+  String get historyEmpty => 'Bu yerda oldingi abonementlar paydo bo‘ladi';
+
+  @override
+  String get more => 'Yana';
+
+  @override
+  String get menuContract => 'Shartnoma';
+
+  @override
+  String get menuRules => 'Klub qoidalari';
+
+  @override
+  String get menuSupport => 'Yordam';
+
+  @override
+  String get perMonth => '/ oy';
+
+  @override
+  String get editProfile => 'Profilni tahrirlash';
+
+  @override
+  String get phoneStatusConfirmed => 'Tasdiqlangan';
+
+  @override
+  String get phoneStatusNotConfirmed => 'Tasdiqlanmagan';
+
+  @override
+  String get phoneChangeHintShort =>
+      'Raqam klub administratori orqali o‘zgartiriladi';
+
+  @override
+  String get statVisits => 'Tashriflar';
+
+  @override
+  String get memberSince => 'Klubda';
+
+  @override
+  String filledOf(int filled, int total) {
+    return '$filled / $total to‘ldirilgan';
+  }
+
+  @override
+  String get addEmail => 'Email qo‘shish';
+
+  @override
+  String get settings => 'Sozlamalar';
+
+  @override
+  String get faceIdLogin => 'Face ID orqali kirish';
+
+  @override
+  String get logoutAccount => 'Akkauntdan chiqish';
+
+  @override
+  String appVersion(String version) {
+    return 'Fitness Formula · versiya $version';
+  }
+
+  @override
+  String get editTitle => 'Tahrirlash';
+
+  @override
+  String get done => 'Tayyor';
+
+  @override
+  String get changePhoto => 'Rasmni almashtirish';
+
+  @override
+  String get photoSoon => 'Rasmni almashtirish tez orada qo‘shiladi';
+
+  @override
+  String get languageName => 'O‘zbekcha';
 }

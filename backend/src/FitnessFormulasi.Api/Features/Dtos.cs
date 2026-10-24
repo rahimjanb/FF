@@ -15,12 +15,26 @@ public record MembershipDto(
 
 public record TrainerPublicDto(
     Guid Id, string FirstName, string LastName, string? Specialization, string? Bio, int? ExperienceYears,
-    bool IsAcceptingClients);
+    bool IsAcceptingClients, int PhotoVersion)
+{
+    /// <summary>Relative URL of the photo, or null when there is none.</summary>
+    public string? PhotoUrl => TrainerPhotoUrl.For(Id, PhotoVersion);
+}
 
 public record TrainerAdminDto(
     Guid Id, Guid UserId, string Phone, string FirstName, string LastName, string? Specialization, string? Bio,
     int? ExperienceYears, bool IsAcceptingClients, bool IsActive, UserStatus UserStatus, int ClientsCount,
-    DateTimeOffset CreatedAt);
+    DateTimeOffset CreatedAt, int PhotoVersion)
+{
+    public string? PhotoUrl => TrainerPhotoUrl.For(Id, PhotoVersion);
+}
+
+public static class TrainerPhotoUrl
+{
+    /// <summary>The version in the query makes the URL change with the photo, so it can be cached for long.</summary>
+    public static string? For(Guid trainerId, int version) =>
+        version == 0 ? null : $"/api/trainers/{trainerId}/photo?v={version}";
+}
 
 public record ClientAdminDto(
     Guid Id, Guid UserId, string Phone, bool PhoneConfirmed, string FirstName, string LastName, string? Email,
@@ -34,7 +48,7 @@ public record TrainerClientDto(
 
 public record ClientProfileDto(
     Guid Id, string Phone, bool PhoneConfirmed, string FirstName, string LastName, string? Email,
-    DateOnly? BirthDate, Gender? Gender, TrainerPublicDto? AssignedTrainer);
+    DateOnly? BirthDate, Gender? Gender, TrainerPublicDto? AssignedTrainer, DateTimeOffset MemberSince);
 
 public record TrainerRequestDto(
     Guid Id, TrainerRequestStatus Status, string? Message, string? ResponseComment,

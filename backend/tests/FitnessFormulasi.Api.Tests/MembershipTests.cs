@@ -141,6 +141,24 @@ public class MembershipTests(ApiFactory factory)
     }
 
     [Fact]
+    public async Task Client_sees_only_active_plans()
+    {
+        var admin = await factory.AdminAsync();
+        var active = await _s.CreatePlanAsync(admin, days: 90);
+        var hidden = await _s.CreatePlanAsync(admin);
+        (await admin.PutAsJsonAsync($"/api/admin/membership-plans/{hidden.Id}", new
+        {
+            hidden.Name, type = "Unlimited", hidden.DurationDays, hidden.Price, isActive = false,
+        }, Json)).EnsureSuccessStatusCode();
+        var (client, _) = await _s.RegisterClientAsync();
+
+        var plans = (await client.GetFromJsonAsync<List<MembershipPlanDto>>("/api/me/plans", Json))!;
+        Assert.Contains(plans, p => p.Id == active.Id && p.Price == active.Price && p.DurationDays == 90);
+        Assert.DoesNotContain(plans, p => p.Id == hidden.Id);
+        Assert.All(plans, p => Assert.True(p.IsActive));
+    }
+
+    [Fact]
     public async Task Visits_are_linked_to_membership_and_limit_is_enforced()
     {
         var admin = await factory.AdminAsync();

@@ -204,5 +204,6 @@ public sealed class AuthService(
     private static AuthResponse ToResponse(TokenPair pair, User user) =>
         new(pair.AccessToken, pair.AccessTokenExpiresAt, pair.RefreshToken, pair.RefreshTokenExpiresAt, ToDto(user));
 
-    private static AuthUserDto ToDto(User u) => new(u.Id, u.Phone, u.PhoneConfirmed, u.FirstName, u.LastName, u.Role.Name, u.MustChangePassword);
+    private static AuthUserDto ToDto(User u) => new(u.Id, u.Phone, u.PhoneConfirmed, u.FirstName, u.LastName, u.Role.Name, u.MustChangePassword,
+        u.Role.Name == RoleNames.Admin && u.CanManageIntegrations);
 }

@@ -15,4 +15,7 @@ class AppConfig {
   /// Club time zone is Asia/Tashkent (UTC+5, no daylight saving time).
   /// Session times are always shown in club time regardless of the phone's settings.
   static const clubUtcOffset = Duration(hours: 5);
+
+  /// Absolute URL for a path returned by the API (e.g. a trainer photo).
+  static String resolve(String path) => '$apiBaseUrl$path';
 }

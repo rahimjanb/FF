@@ -33,6 +33,8 @@ public class PhoneVerificationConfirmRequest
     [Required, RegularExpression(@"^\d{6}$")] public string Code { get; set; } = "";
 }
 
-public record AuthUserDto(Guid Id, string Phone, bool PhoneConfirmed, string FirstName, string LastName, string Role, bool MustChangePassword);
+public record AuthUserDto(
+    Guid Id, string Phone, bool PhoneConfirmed, string FirstName, string LastName, string Role, bool MustChangePassword,
+    bool CanManageIntegrations);
 
 public record AuthResponse(string AccessToken, DateTimeOffset AccessTokenExpiresAt, string RefreshToken, DateTimeOffset RefreshTokenExpiresAt, AuthUserDto User);

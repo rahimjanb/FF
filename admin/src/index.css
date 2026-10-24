@@ -122,3 +122,12 @@ a.stat:hover { border-color: var(--accent); }
   .content { padding: 20px 16px; overflow-x: auto; }
   .grid-2 { grid-template-columns: 1fr; }
 }
+
+.person { display: inline-flex; align-items: center; gap: 10px; }
+.avatar { border-radius: 50%; object-fit: cover; flex: none; }
+.avatar-empty { display: inline-flex; align-items: center; justify-content: center; background: var(--surface); border: 1px solid var(--border); font-weight: 600; }
+.photo-field { display: flex; align-items: center; gap: 12px; }
+
+.banner-info { background: #eff8ff; color: #175cd3; border: 1px solid #b2ddff; }
+.banner-success { background: #ecfdf3; color: #067647; border: 1px solid #abefc6; }
+.secret-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--border); }

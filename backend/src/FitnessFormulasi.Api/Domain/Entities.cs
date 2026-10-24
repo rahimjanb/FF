@@ -40,6 +40,8 @@ public class User : Entity
     /// Until the user sets their own password, the API only allows changing it.
     /// </summary>
     public bool MustChangePassword { get; set; }
+    /// <summary>Administrator allowed to view and change payment integration settings (Click, Payme).</summary>
+    public bool CanManageIntegrations { get; set; }
     public int AccessFailedCount { get; set; }
     public DateTimeOffset? LockoutEnd { get; set; }
     public DateTimeOffset? LastLoginAt { get; set; }
@@ -103,8 +105,18 @@ public class TrainerProfile : Entity
     public int? ExperienceYears { get; set; }
     public bool IsAcceptingClients { get; set; } = true;
     public bool IsActive { get; set; } = true;
+    /// <summary>Bumped on every photo change; 0 means no photo. Part of the photo URL so clients can cache it.</summary>
+    public int PhotoVersion { get; set; }
 
     public ICollection<ClientProfile> Clients { get; set; } = [];
+}
+
+/// <summary>Trainer photo bytes, kept apart from the profile so profile queries never load them.</summary>
+public class TrainerPhoto
+{
+    public Guid TrainerProfileId { get; set; }
+    public required byte[] Data { get; set; }
+    public required string ContentType { get; set; }
 }
 
 public enum MembershipPlanType { Unlimited, LimitedVisits }

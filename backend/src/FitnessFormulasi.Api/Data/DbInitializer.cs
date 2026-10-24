@@ -56,6 +56,7 @@ public static class DbInitializer
         // The bootstrap password comes from configuration, so it is treated as temporary.
         var admin = await auth.CreateUserAsync(phone, opt.AdminPassword, opt.AdminFirstName, opt.AdminLastName, RoleNames.Admin, ct,
             assignedByStaff: true);
+        admin.CanManageIntegrations = true; // the first administrator manages payment integrations
         await db.SaveChangesAsync(ct);
         logger.LogInformation("Bootstrap administrator {UserId} created", admin.Id);
     }

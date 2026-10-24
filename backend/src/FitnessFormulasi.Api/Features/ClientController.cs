@@ -71,6 +71,12 @@ public class ClientController(
     public async Task<List<MembershipDto>> Memberships(CancellationToken ct) =>
         await memberships.ForClientAsync(await profiles.ClientIdAsync(ct), ct);
 
+    /// <summary>Plans currently on sale, for the client to compare. Read-only: purchase happens at the club desk in stage 1.</summary>
+    [HttpGet("plans")]
+    public async Task<List<MembershipPlanDto>> Plans(CancellationToken ct) =>
+        await db.MembershipPlans.Where(p => p.IsActive).OrderBy(p => p.DurationDays).ThenBy(p => p.Price).ThenBy(p => p.Id)
+            .Select(Projections.Plan).ToListAsync(ct);
+
     [HttpGet("trainer-requests")]
     public async Task<List<TrainerRequestDto>> TrainerRequests(CancellationToken ct)
     {
@@ -136,5 +142,6 @@ public class ClientController(
             c.AssignedTrainer == null ? null : new TrainerPublicDto(
                 c.AssignedTrainer.Id, c.AssignedTrainer.User.FirstName, c.AssignedTrainer.User.LastName,
                 c.AssignedTrainer.Specialization, c.AssignedTrainer.Bio, c.AssignedTrainer.ExperienceYears,
-                c.AssignedTrainer.IsAcceptingClients))).SingleAsync(ct);
+                c.AssignedTrainer.IsAcceptingClients, c.AssignedTrainer.PhotoVersion),
+            c.CreatedAt)).SingleAsync(ct);
 }

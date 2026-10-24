@@ -6,6 +6,7 @@ using FitnessFormulasi.Api.Common;
 using FitnessFormulasi.Api.Data;
 using FitnessFormulasi.Api.Domain;
 using FitnessFormulasi.Api.Features;
+using FitnessFormulasi.Api.Features.Integrations;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -38,6 +39,9 @@ builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<MembershipService>();
 builder.Services.AddScoped<TrainerRequestService>();
 builder.Services.AddScoped<TrainingSessionService>();
+builder.Services.Configure<IntegrationsOptions>(config.GetSection(IntegrationsOptions.Section));
+builder.Services.AddSingleton<SecretProtector>();
+builder.Services.AddScoped<IntegrationSettingsService>();
 
 // SMS: the logging sender exists only in Development. Production answers 503 until a real provider is connected.
 if (builder.Environment.IsDevelopment())
@@ -73,13 +77,21 @@ builder.Services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationSc
                 var id = Guid.TryParse(ctx.Principal?.FindFirstValue(ClaimTypes.NameIdentifier), out var g) ? g : Guid.Empty;
                 var role = ctx.Principal?.FindFirstValue(ClaimTypes.Role);
                 var state = await db.Users.Where(u => u.Id == id && u.Status == UserStatus.Active && u.Role.Name == role)
-                    .Select(u => new { u.MustChangePassword }).SingleOrDefaultAsync(ctx.HttpContext.RequestAborted);
-                if (state is null) ctx.Fail("User is inactive or role changed.");
-                else ctx.HttpContext.Items[PasswordChangeGate.ItemKey] = state.MustChangePassword;
+                    .Select(u => new { u.MustChangePassword, u.CanManageIntegrations }).SingleOrDefaultAsync(ctx.HttpContext.RequestAborted);
+                if (state is null)
+                {
+                    ctx.Fail("User is inactive or role changed.");
+                    return;
+                }
+                ctx.HttpContext.Items[PasswordChangeGate.ItemKey] = state.MustChangePassword;
+                // Permissions come from the database, not the token, so revoking one takes effect on the next request.
+                if (state.CanManageIntegrations && role == RoleNames.Admin && ctx.Principal?.Identity is ClaimsIdentity identity)
+                    identity.AddClaim(new Claim(Permissions.ClaimType, Permissions.ManageIntegrations));
             },
         };
     });
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(o => o.AddPolicy(Permissions.ManageIntegrations, p => p
+    .RequireRole(RoleNames.Admin).RequireClaim(Permissions.ClaimType, Permissions.ManageIntegrations)));
 
 builder.Services.AddRateLimiter(o =>
 {
@@ -124,6 +136,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
+_ = app.Services.GetRequiredService<SecretProtector>(); // fail fast on a malformed encryption key
 
 app.UseExceptionHandler();
 app.UseStatusCodePages();

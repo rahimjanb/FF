@@ -50,6 +50,17 @@ class FakeBackend {
     'unreadNotifications': 2,
   };
 
+  static Map<String, dynamic> plan(String id, String name, {int days = 30, num price = 350000, int? visitLimit}) => {
+    'id': id,
+    'name': name,
+    'description': null,
+    'type': visitLimit == null ? 'Unlimited' : 'LimitedVisits',
+    'durationDays': days,
+    'visitLimit': visitLimit,
+    'price': price,
+    'isActive': true,
+  };
+
   String role = 'Client';
 
   /// Per-test responses: path -> JSON body, or an [http.Response] (e.g. an error).
@@ -116,6 +127,8 @@ class FakeBackend {
       '/api/auth/me' => json(user(role)),
       '/api/me/dashboard' => json(dashboard()),
       '/api/me/memberships' => json([membership()]),
+      '/api/me/plans' => json([plan('p1', 'Gold 30')]),
+      '/api/me/visits' => json({'items': <Object>[], 'page': 1, 'pageSize': 50, 'totalCount': 0, 'totalPages': 0}),
       _ => problem(404, 'not_found'),
     };
   });

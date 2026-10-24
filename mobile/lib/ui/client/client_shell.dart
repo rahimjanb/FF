@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../l10n/gen/app_localizations.dart';
+import '../theme.dart';
+import '../widgets/glass.dart';
 import 'home_screen.dart';
 import 'membership_screen.dart';
 import 'profile_screen.dart';
@@ -34,6 +36,16 @@ class _ClientShellState extends State<ClientShell> {
       WorkoutsScreen(key: ValueKey('workouts$_generation'), onNavigate: _go),
       const ProfileScreen(),
     ];
+    final bottomInset = MediaQuery.paddingOf(context).bottom;
+    // Home, Membership and Profile scroll under the floating tab bar and pad themselves;
+    // other tabs get the space reserved below them.
+    const underBar = {0, 1, 4};
+    Widget page(int i) => underBar.contains(i)
+        ? pages[i]
+        : Padding(
+            padding: EdgeInsets.only(bottom: Brand.tabBarReserve + bottomInset),
+            child: MediaQuery.removePadding(context: context, removeBottom: true, child: pages[i]),
+          );
     // Android Back on another tab returns to Home first; only Back on Home leaves the app.
     return PopScope(
       canPop: _index == 0,
@@ -41,34 +53,28 @@ class _ClientShellState extends State<ClientShell> {
         if (!didPop) _go(0);
       },
       child: Scaffold(
-        body: IndexedStack(index: _index, children: pages),
-        bottomNavigationBar: NavigationBar(
-          selectedIndex: _index,
-          onDestinationSelected: _go,
-          destinations: [
-            NavigationDestination(
-              icon: const Icon(Icons.home_outlined),
-              selectedIcon: const Icon(Icons.home_rounded),
-              label: t.tabHome,
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.credit_card_outlined),
-              selectedIcon: const Icon(Icons.credit_card_rounded),
+        backgroundColor: Brand.background,
+        extendBody: true,
+        body: IndexedStack(index: _index, children: [for (var i = 0; i < pages.length; i++) page(i)]),
+        bottomNavigationBar: GlassTabBar(
+          index: _index,
+          onSelected: _go,
+          items: [
+            GlassTabItem(icon: Icons.home_outlined, activeIcon: Icons.home_rounded, label: t.tabHome),
+            GlassTabItem(
+              icon: Icons.credit_card_outlined,
+              activeIcon: Icons.credit_card_rounded,
               label: t.tabMembership,
             ),
-            NavigationDestination(
-              icon: const Icon(Icons.groups_outlined),
-              selectedIcon: const Icon(Icons.groups_rounded),
-              label: t.tabTrainers,
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.fitness_center_outlined),
-              selectedIcon: const Icon(Icons.fitness_center_rounded),
+            GlassTabItem(icon: Icons.group_outlined, activeIcon: Icons.group_rounded, label: t.tabTrainers),
+            GlassTabItem(
+              icon: Icons.fitness_center_outlined,
+              activeIcon: Icons.fitness_center_rounded,
               label: t.tabWorkouts,
             ),
-            NavigationDestination(
-              icon: const Icon(Icons.person_outline_rounded),
-              selectedIcon: const Icon(Icons.person_rounded),
+            GlassTabItem(
+              icon: Icons.account_circle_outlined,
+              activeIcon: Icons.account_circle_rounded,
               label: t.tabProfile,
             ),
           ],

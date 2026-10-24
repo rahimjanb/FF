@@ -36,6 +36,7 @@ public class ProfileTests(ApiFactory factory)
         Assert.Equal(Gender.Female, p.Gender);
         Assert.Equal(auth.User.Phone, p.Phone);
         Assert.Null(p.AssignedTrainer);
+        Assert.True(p.MemberSince > DateTimeOffset.UtcNow.AddMinutes(-5)); // the "member since" date is the sign-up time
         var me = (await client.GetFromJsonAsync<AuthUserDto>("/api/auth/me", Json))!;
         Assert.Equal("Client", me.Role);
 

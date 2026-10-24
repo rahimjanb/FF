@@ -151,9 +151,12 @@ void showSnack(BuildContext context, String text) => ScaffoldMessenger.of(contex
 
 /// Loads data with loading / error / data states and pull-to-refresh support.
 class AsyncView<T> extends StatefulWidget {
-  const AsyncView({super.key, required this.load, required this.builder});
+  const AsyncView({super.key, required this.load, required this.builder, this.loading});
   final Future<T> Function() load;
   final Widget Function(BuildContext context, T data, Future<void> Function() reload) builder;
+
+  /// Placeholder while the first load runs (default: a spinner).
+  final WidgetBuilder? loading;
 
   @override
   State<AsyncView<T>> createState() => _AsyncViewState<T>();
@@ -195,7 +198,10 @@ class _AsyncViewState<T> extends State<AsyncView<T>> {
       if (snap.hasError) {
         child = ErrorView(key: const ValueKey('error'), error: snap.error!, onRetry: _reload);
       } else if (!snap.hasData) {
-        child = const LoadingView(key: ValueKey('loading'));
+        child = KeyedSubtree(
+          key: const ValueKey('loading'),
+          child: widget.loading?.call(context) ?? const LoadingView(),
+        );
       } else {
         child = KeyedSubtree(key: const ValueKey('data'), child: widget.builder(context, snap.data as T, _reload));
       }

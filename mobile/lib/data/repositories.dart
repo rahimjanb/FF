@@ -59,6 +59,10 @@ class ClientRepository {
       .map((e) => Membership.fromJson(e as Map<String, dynamic>))
       .toList();
 
+  /// Plans currently on sale (read-only; purchase is at the club desk in stage 1).
+  Future<List<MembershipPlan>> plans() async =>
+      (await _api.get('/api/me/plans') as List).map((e) => MembershipPlan.fromJson(e as Map<String, dynamic>)).toList();
+
   Future<ClientProfile> profile() async =>
       ClientProfile.fromJson(await _api.get('/api/me/profile') as Map<String, dynamic>);
 
@@ -85,6 +89,12 @@ class ClientRepository {
         as Map<String, dynamic>,
     TrainingSession.fromJson,
   ).items;
+
+  /// Times of the latest visits, newest first (one page of 50 — enough for the weekly chart on Home).
+  Future<List<DateTime>> recentVisitTimes() async =>
+      ((await _api.get('/api/me/visits', query: {'pageSize': '50'}) as Map<String, dynamic>)['items'] as List)
+          .map((e) => DateTime.parse((e as Map<String, dynamic>)['visitedAt'] as String))
+          .toList();
 
   /// Ended, completed and cancelled sessions, most recent first, one page at a time.
   Future<Paged<TrainingSession>> sessionHistory({int page = 1}) async => Paged.fromJson(

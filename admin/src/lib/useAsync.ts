@@ -26,6 +26,8 @@ export function useAsync<T>(load: () => Promise<T>, deps: unknown[]) {
 
 const codeMessages: Record<string, string> = {
   phone_taken: 'Пользователь с таким номером уже существует.',
+  photo_invalid_format: 'Загрузите изображение JPEG, PNG или WebP.',
+  photo_too_large: 'Фото должно быть не больше 2 МБ.',
   membership_overlap: 'У клиента уже есть абонемент на эти даты.',
   plan_inactive: 'Этот план абонемента отключён.',
   plan_name_taken: 'План с таким названием уже существует.',
@@ -40,6 +42,13 @@ const codeMessages: Record<string, string> = {
   invalid_password: 'Текущий пароль указан неверно.',
   password_unchanged: 'Новый пароль должен отличаться от текущего.',
   password_change_required: 'Сначала смените временный пароль.',
+  integration_incomplete: 'Заполните все поля выбранного режима, затем включайте интеграцию.',
+  integration_enabled: 'Сначала выключите интеграцию, потом удаляйте ключ активного режима.',
+  encryption_not_configured: 'На сервере не задан ключ шифрования (Integrations__EncryptionKey). Секреты сохранить нельзя.',
+  invalid_field: 'Значение поля в неверном формате.',
+  invalid_secret: 'Ключ в неверном формате: 8–256 символов без пробелов.',
+  unknown_field: 'Это поле нельзя изменить таким способом.',
+  concurrency_conflict: 'Настройки изменил кто-то другой. Обновите страницу и повторите.',
 }
 
 export function errorMessage(e: unknown): string {

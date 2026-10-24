@@ -11,12 +11,16 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, TimeProvider t
     public DbSet<PhoneVerificationCode> PhoneVerificationCodes => Set<PhoneVerificationCode>();
     public DbSet<ClientProfile> ClientProfiles => Set<ClientProfile>();
     public DbSet<TrainerProfile> TrainerProfiles => Set<TrainerProfile>();
+    public DbSet<TrainerPhoto> TrainerPhotos => Set<TrainerPhoto>();
     public DbSet<MembershipPlan> MembershipPlans => Set<MembershipPlan>();
     public DbSet<Membership> Memberships => Set<Membership>();
     public DbSet<TrainerRequest> TrainerRequests => Set<TrainerRequest>();
     public DbSet<TrainingSession> TrainingSessions => Set<TrainingSession>();
     public DbSet<Visit> Visits => Set<Visit>();
     public DbSet<Notification> Notifications => Set<Notification>();
+    public DbSet<IntegrationSetting> IntegrationSettings => Set<IntegrationSetting>();
+    public DbSet<IntegrationSecret> IntegrationSecrets => Set<IntegrationSecret>();
+    public DbSet<AuditLogEntry> AuditLog => Set<AuditLogEntry>();
 
     protected override void ConfigureConventions(ModelConfigurationBuilder builder)
     {
@@ -30,6 +34,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, TimeProvider t
         builder.Properties<TrainingSessionStatus>().HaveConversion<string>().HaveMaxLength(32);
         builder.Properties<VisitSource>().HaveConversion<string>().HaveMaxLength(32);
         builder.Properties<NotificationType>().HaveConversion<string>().HaveMaxLength(64);
+        builder.Properties<IntegrationProvider>().HaveConversion<string>().HaveMaxLength(32);
+        builder.Properties<IntegrationMode>().HaveConversion<string>().HaveMaxLength(16);
     }
 
     protected override void OnModelCreating(ModelBuilder b)
@@ -91,6 +97,13 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, TimeProvider t
             e.ToTable(t => t.HasCheckConstraint("CK_TrainerProfiles_ExperienceYears", "\"ExperienceYears\" IS NULL OR \"ExperienceYears\" BETWEEN 0 AND 80"));
         });
 
+        b.Entity<TrainerPhoto>(e =>
+        {
+            e.HasKey(x => x.TrainerProfileId);
+            e.Property(x => x.ContentType).HasMaxLength(32);
+            e.HasOne<TrainerProfile>().WithOne().HasForeignKey<TrainerPhoto>(x => x.TrainerProfileId).OnDelete(DeleteBehavior.Cascade);
+        });
+
         b.Entity<MembershipPlan>(e =>
         {
             e.Property(x => x.Name).HasMaxLength(128);
@@ -147,6 +160,29 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, TimeProvider t
             e.HasIndex(x => x.MembershipId);
             e.HasOne(x => x.ClientProfile).WithMany(c => c.Visits).HasForeignKey(x => x.ClientProfileId).OnDelete(DeleteBehavior.Restrict);
             e.HasOne(x => x.Membership).WithMany(m => m.Visits).HasForeignKey(x => x.MembershipId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        b.Entity<IntegrationSetting>(e =>
+        {
+            e.Property(x => x.Version).IsRowVersion();
+            e.Property(x => x.TestValuesJson).HasColumnType("jsonb");
+            e.Property(x => x.ProductionValuesJson).HasColumnType("jsonb");
+            e.HasIndex(x => x.Provider).IsUnique();
+        });
+
+        b.Entity<IntegrationSecret>(e =>
+        {
+            e.Property(x => x.Name).HasMaxLength(64);
+            e.Property(x => x.Ciphertext).HasMaxLength(4096);
+            e.HasIndex(x => new { x.Provider, x.Mode, x.Name }).IsUnique();
+        });
+
+        b.Entity<AuditLogEntry>(e =>
+        {
+            e.Property(x => x.Action).HasMaxLength(64);
+            e.Property(x => x.Target).HasMaxLength(128);
+            e.Property(x => x.Details).HasMaxLength(2000);
+            e.HasIndex(x => new { x.Target, x.CreatedAt });
         });
 
         b.Entity<Notification>(e =>

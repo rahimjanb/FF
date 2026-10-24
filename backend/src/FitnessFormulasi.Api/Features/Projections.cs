@@ -31,11 +31,11 @@ public static class Projections
         p.Id, p.Name, p.Description, p.Type, p.DurationDays, p.VisitLimit, p.Price, p.IsActive);
 
     public static readonly Expression<Func<TrainerProfile, TrainerPublicDto>> TrainerPublic = t => new TrainerPublicDto(
-        t.Id, t.User.FirstName, t.User.LastName, t.Specialization, t.Bio, t.ExperienceYears, t.IsAcceptingClients);
+        t.Id, t.User.FirstName, t.User.LastName, t.Specialization, t.Bio, t.ExperienceYears, t.IsAcceptingClients, t.PhotoVersion);
 
     public static readonly Expression<Func<TrainerProfile, TrainerAdminDto>> TrainerAdmin = t => new TrainerAdminDto(
         t.Id, t.UserId, t.User.Phone, t.User.FirstName, t.User.LastName, t.Specialization, t.Bio, t.ExperienceYears,
-        t.IsAcceptingClients, t.IsActive, t.User.Status, t.Clients.Count(), t.CreatedAt);
+        t.IsAcceptingClients, t.IsActive, t.User.Status, t.Clients.Count(), t.CreatedAt, t.PhotoVersion);
 
     public static readonly Expression<Func<TrainerRequest, TrainerRequestDto>> Request = r => new TrainerRequestDto(
         r.Id, r.Status, r.Message, r.ResponseComment, r.CreatedAt, r.RespondedAt,

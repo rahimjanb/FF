@@ -61,13 +61,15 @@ export async function refreshSession(): Promise<boolean> {
 }
 
 export async function api<T>(path: string, init: { method?: string; body?: unknown } = {}): Promise<T> {
+  // FormData (file uploads) is sent as multipart; the browser sets its Content-Type with the boundary.
+  const isForm = init.body instanceof FormData
   const send = () => fetch(`${BASE}${path}`, {
     method: init.method ?? 'GET',
     headers: {
-      ...(init.body !== undefined ? { 'Content-Type': 'application/json' } : {}),
+      ...(init.body !== undefined && !isForm ? { 'Content-Type': 'application/json' } : {}),
       ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
     },
-    body: init.body !== undefined ? JSON.stringify(init.body) : undefined,
+    body: isForm ? (init.body as FormData) : init.body !== undefined ? JSON.stringify(init.body) : undefined,
   })
 
   let res: Response
@@ -91,3 +93,6 @@ export function qs(params: Record<string, string | number | boolean | null | und
   const s = p.toString()
   return s ? `?${s}` : ''
 }
+
+/** Absolute URL of a file served by the API (e.g. a trainer photo URL from a DTO). */
+export const apiUrl = (path: string) => `${BASE}${path}`

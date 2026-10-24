@@ -45,8 +45,16 @@ Future<void> login(WidgetTester tester, String phone, String password) async {
   }
 }
 
+/// Trainer screens have a logout action in the app bar; the client profile has a button at the bottom.
 Future<void> logout(WidgetTester tester) async {
-  await tester.tap(find.byKey(const Key('appbar-logout')).hitTestable());
+  final appBar = find.byKey(const Key('appbar-logout')).hitTestable();
+  if (appBar.evaluate().isNotEmpty) {
+    await tester.tap(appBar);
+  } else {
+    final button = find.byKey(const Key('profile-logout'));
+    await tester.scrollUntilVisible(button, 300, scrollable: find.byType(Scrollable).last);
+    await tester.tap(button);
+  }
   await settle(tester);
   await tester.tap(find.byKey(const Key('logout-confirm')));
   await settle(tester);
@@ -86,7 +94,10 @@ void main() {
     await login(tester, trainerPhone, trainerPassword);
     expect(find.text('Входящие заявки'), findsOneWidget);
     await pause(tester);
-    await waitFor(tester, () => find.text('Принять').evaluate().isNotEmpty || find.text('Принята').evaluate().isNotEmpty);
+    await waitFor(
+      tester,
+      () => find.text('Принять').evaluate().isNotEmpty || find.text('Принята').evaluate().isNotEmpty,
+    );
     if (find.widgetWithText(FilledButton, 'Принять').evaluate().isNotEmpty) {
       await tester.tap(find.widgetWithText(FilledButton, 'Принять').first);
       await settle(tester);

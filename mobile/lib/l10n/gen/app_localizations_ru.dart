@@ -617,4 +617,258 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get loadMore => 'Показать ещё';
+
+  @override
+  String get myMembership => 'Мой абонемент';
+
+  @override
+  String get qrEntry => 'Вход';
+
+  @override
+  String get soon => 'скоро';
+
+  @override
+  String get statusInactive => 'Неактивен';
+
+  @override
+  String get noWorkoutsYet => 'Тренировок пока нет';
+
+  @override
+  String get workoutsByTrainerHint => 'Тренировки назначает ваш тренер';
+
+  @override
+  String get chooseTrainerForWorkoutsHint =>
+      'Выберите тренера, чтобы получать тренировки';
+
+  @override
+  String get findYourTrainer => 'Найдите своего тренера';
+
+  @override
+  String withTrainerShort(String name) {
+    return 'С тренером $name';
+  }
+
+  @override
+  String get membershipPlansSubtitle => 'Выберите подходящий тариф';
+
+  @override
+  String get membershipManageSubtitle => 'Управление и история';
+
+  @override
+  String get plansInfo => 'О тарифах';
+
+  @override
+  String get plansInfoText =>
+      'Тарифы и цены устанавливает клуб. Сейчас абонемент оформляется на ресепшене, онлайн-оплата появится позже.';
+
+  @override
+  String monthsShort(int count) {
+    return '$count мес';
+  }
+
+  @override
+  String daysShortCount(int count) {
+    return '$count дн.';
+  }
+
+  @override
+  String monthsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count месяца',
+      many: '$count месяцев',
+      few: '$count месяца',
+      one: '$count месяц',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String daysCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count дня',
+      many: '$count дней',
+      few: '$count дня',
+      one: '$count день',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String visitsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count посещения',
+      many: '$count посещений',
+      few: '$count посещения',
+      one: '$count посещение',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String perPeriod(String period) {
+    return '/ $period';
+  }
+
+  @override
+  String get currencySum => 'сум';
+
+  @override
+  String get unlimitedVisits => 'Безлимитные посещения';
+
+  @override
+  String validForPeriod(String period) {
+    return 'Действует $period';
+  }
+
+  @override
+  String get paymentMethod => 'Способ оплаты';
+
+  @override
+  String get paymentMethodValue => 'Банковская карта';
+
+  @override
+  String totalFor(String period) {
+    return 'Итого за $period';
+  }
+
+  @override
+  String checkoutPlan(String plan) {
+    return 'Оформить «$plan»';
+  }
+
+  @override
+  String get alsoAtReception => 'Также можно оформить на ресепшене клуба';
+
+  @override
+  String get onlinePaymentSoon =>
+      'Онлайн-оплата скоро будет доступна. Пока абонемент можно оформить на ресепшене клуба.';
+
+  @override
+  String get noPlansTitle => 'Тарифы пока не опубликованы';
+
+  @override
+  String get noPlansHint => 'Уточните стоимость на ресепшене клуба';
+
+  @override
+  String get statusExpiring => 'Скоро истекает';
+
+  @override
+  String ofTotal(int total) {
+    return 'из $total';
+  }
+
+  @override
+  String get validTillLabel => 'Действует до';
+
+  @override
+  String get ownerLabel => 'Владелец';
+
+  @override
+  String get numberLabel => 'Номер';
+
+  @override
+  String get showQrPass => 'Показать QR-пропуск';
+
+  @override
+  String get actionFreeze => 'Заморозить';
+
+  @override
+  String get actionRenew => 'Продлить';
+
+  @override
+  String get actionGuest => 'Гость';
+
+  @override
+  String get actionChangePlan => 'Сменить';
+
+  @override
+  String get includedTitle => 'Включено в абонемент';
+
+  @override
+  String get startLabel => 'Начало';
+
+  @override
+  String usedOfLimit(int used, int limit) {
+    return '$used из $limit';
+  }
+
+  @override
+  String get historyEmpty => 'Здесь появятся прошлые абонементы';
+
+  @override
+  String get more => 'Ещё';
+
+  @override
+  String get menuContract => 'Договор';
+
+  @override
+  String get menuRules => 'Правила клуба';
+
+  @override
+  String get menuSupport => 'Поддержка';
+
+  @override
+  String get perMonth => '/ мес';
+
+  @override
+  String get editProfile => 'Редактировать профиль';
+
+  @override
+  String get phoneStatusConfirmed => 'Подтверждён';
+
+  @override
+  String get phoneStatusNotConfirmed => 'Не подтверждён';
+
+  @override
+  String get phoneChangeHintShort =>
+      'Номер меняется через администратора клуба';
+
+  @override
+  String get statVisits => 'Посещений';
+
+  @override
+  String get memberSince => 'В клубе с';
+
+  @override
+  String filledOf(int filled, int total) {
+    return '$filled из $total заполнено';
+  }
+
+  @override
+  String get addEmail => 'Добавить email';
+
+  @override
+  String get settings => 'Настройки';
+
+  @override
+  String get faceIdLogin => 'Вход по Face ID';
+
+  @override
+  String get logoutAccount => 'Выйти из аккаунта';
+
+  @override
+  String appVersion(String version) {
+    return 'Fitness Formula · версия $version';
+  }
+
+  @override
+  String get editTitle => 'Редактирование';
+
+  @override
+  String get done => 'Готово';
+
+  @override
+  String get changePhoto => 'Сменить фото';
+
+  @override
+  String get photoSoon => 'Смена фото скоро будет доступна';
+
+  @override
+  String get languageName => 'Русский';
 }

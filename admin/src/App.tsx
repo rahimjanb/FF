@@ -9,6 +9,8 @@ import { LoginPage } from './pages/LoginPage'
 import { MembershipsPage } from './pages/MembershipsPage'
 import { PlansPage } from './pages/PlansPage'
 import { ReportsPage } from './pages/ReportsPage'
+import { IntegrationsPage } from './pages/IntegrationsPage'
+import { GeneralSettings, SettingsPage } from './pages/SettingsPage'
 import { RequestsPage } from './pages/RequestsPage'
 import { TrainersPage } from './pages/TrainersPage'
 import { VisitsPage } from './pages/VisitsPage'
@@ -23,6 +25,7 @@ const nav = [
   { to: '/requests', label: 'Заявки' },
   { to: '/visits', label: 'Посещения' },
   { to: '/reports', label: 'Отчёты' },
+  { to: '/settings', label: 'Настройки' },
 ]
 
 function Layout() {
@@ -62,6 +65,11 @@ export default function App() {
             <Route path="requests" element={<RequestsPage />} />
             <Route path="visits" element={<VisitsPage />} />
             <Route path="reports" element={<ReportsPage />} />
+            <Route path="settings" element={<SettingsPage />}>
+              <Route index element={<Navigate to="general" replace />} />
+              <Route path="general" element={<GeneralSettings />} />
+              <Route path="integrations" element={<IntegrationsPage />} />
+            </Route>
             <Route path="password" element={<ChangePasswordPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>

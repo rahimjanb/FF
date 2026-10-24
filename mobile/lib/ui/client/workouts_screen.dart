@@ -106,7 +106,7 @@ class _TrainerCard extends StatelessWidget {
                   backgroundColor: AppColors.surfaceHigh,
                   child: Icon(Icons.person_search_rounded, color: AppColors.textSecondary),
                 )
-              : TrainerAvatar(name: tr.firstName, radius: 24),
+              : TrainerAvatar(name: tr.firstName, radius: 24, photoUrl: tr.photoUrl),
           const SizedBox(width: 14),
           Expanded(
             child: Column(

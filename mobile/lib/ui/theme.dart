@@ -15,6 +15,55 @@ class AppColors {
   static const red = Color(0xFFFF6B6B);
 }
 
+/// Liquid Glass tokens of the Fitness Formula brand (client home screen and tab bar).
+class Brand {
+  static const background = Color(0xFF050507);
+  static const accent = Color(0xFF1FACD8);
+  static const accentDark = Color(0xFF1386B8);
+  static const buttonGradient = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [Color(0xFF2BBBE8), Color(0xFF1386B8)],
+  );
+
+  static const textPrimary = Colors.white;
+  static final textSecondary = Colors.white.withValues(alpha: 0.6);
+  static final textTertiary = Colors.white.withValues(alpha: 0.4);
+
+  // Glass: white 11% -> 4% fill, 1px white 14% stroke, background blur ~28 (sigma = blur / 2).
+  static final glassGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Colors.white.withValues(alpha: 0.11), Colors.white.withValues(alpha: 0.04)],
+  );
+  static final glassStroke = Colors.white.withValues(alpha: 0.14);
+  static const glassBlurSigma = 14.0;
+
+  static const radiusHero = 28.0;
+  static const radiusCard = 22.0;
+  static const sidePadding = 20.0;
+  static const sectionGap = 22.0;
+
+  static const red = Color(0xFFFF5A5F);
+  static const redText = Color(0xFFFF8A8D);
+  static const blue = Color(0xFF4F8BFF);
+  static const blueIcon = Color(0xFF6FA0FF);
+  static const flame = Color(0xFFFF8A4C);
+  static const trophy = Color(0xFFFFC93C);
+  static const clock = Color(0xFF5AD2F4);
+  static const glowBlue = Color(0xFF2340E0);
+  static const glowCyan = Color(0xFF19C6E6);
+  static const glowRoyal = Color(0xFF2B6BFF);
+  static const purple = Color(0xFFB48CFF);
+  static const success = Color(0xFF34D399);
+  static const successText = Color(0xFF4ADE80);
+
+  /// Floating tab bar geometry; screens under it reserve [tabBarReserve] plus the bottom safe area.
+  static const tabBarHeight = 66.0;
+  static const tabBarBottom = 14.0;
+  static const tabBarReserve = tabBarHeight + tabBarBottom + 12;
+}
+
 ThemeData buildDarkTheme() {
   const scheme = ColorScheme.dark(
     primary: AppColors.accent,

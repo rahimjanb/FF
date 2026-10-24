@@ -24,6 +24,21 @@ public class TrainersController(AppDbContext db) : ControllerBase
         await Active().Where(t => t.Id == id).Select(Projections.TrainerPublic).SingleOrDefaultAsync(ct)
         ?? throw ApiException.NotFound("Trainer");
 
+    /// <summary>
+    /// Trainer photo. Anonymous so that image widgets and &lt;img&gt; tags can load it without a bearer token:
+    /// it is the same picture the club shows to every client. The versioned URL lets it be cached for long.
+    /// </summary>
+    [HttpGet("{id:guid}/photo")]
+    [AllowAnonymous]
+    [Produces("image/jpeg", "image/png", "image/webp")]
+    public async Task<IActionResult> Photo(Guid id, CancellationToken ct)
+    {
+        var photo = await db.TrainerPhotos.AsNoTracking().SingleOrDefaultAsync(p => p.TrainerProfileId == id, ct)
+            ?? throw ApiException.NotFound("Photo");
+        Response.Headers.CacheControl = "public, max-age=31536000, immutable";
+        return File(photo.Data, photo.ContentType);
+    }
+
     private IQueryable<TrainerProfile> Active() =>
         db.TrainerProfiles.Where(t => t.IsActive && t.User.Status == UserStatus.Active);
 }

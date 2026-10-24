@@ -32,6 +32,7 @@ services:
       ASPNETCORE_ENVIRONMENT: ${API_ENVIRONMENT:-Production}
       ConnectionStrings__Default: Host=postgres;Port=5432;Database=${POSTGRES_DB:-fitness_formulasi};Username=${POSTGRES_USER:-ff_app};Password=${POSTGRES_PASSWORD}
       Jwt__SigningKey: ${JWT_SIGNING_KEY:-}
+      Integrations__EncryptionKey: ${INTEGRATIONS_ENCRYPTION_KEY:-}
       Database__MigrateOnStartup: "true"
       Bootstrap__AdminPhone: ${BOOTSTRAP_ADMIN_PHONE:-}
       Bootstrap__AdminPassword: ${BOOTSTRAP_ADMIN_PASSWORD:-}

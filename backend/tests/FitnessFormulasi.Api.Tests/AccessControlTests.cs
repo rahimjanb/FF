@@ -15,6 +15,7 @@ public class AccessControlTests(ApiFactory factory)
     [InlineData("/api/admin/dashboard")]
     [InlineData("/api/admin/clients")]
     [InlineData("/api/me/dashboard")]
+    [InlineData("/api/me/plans")]
     [InlineData("/api/trainer/clients")]
     [InlineData("/api/trainers")]
     public async Task Anonymous_requests_are_rejected(string url) =>
@@ -35,6 +36,7 @@ public class AccessControlTests(ApiFactory factory)
     [Theory]
     [InlineData("/api/admin/clients")]
     [InlineData("/api/me/dashboard")]
+    [InlineData("/api/me/plans")]
     public async Task Trainer_cannot_reach_admin_or_client_endpoints(string url)
     {
         var (trainer, _) = await _s.CreateTrainerAsync(await factory.AdminAsync());

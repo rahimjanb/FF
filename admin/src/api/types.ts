@@ -14,6 +14,8 @@ export interface AuthUser {
   id: string; phone: string; phoneConfirmed: boolean; firstName: string; lastName: string; role: Role
   /** Password was set by staff or bootstrap config; the API allows only changing it until done. */
   mustChangePassword: boolean
+  /** Administrator allowed to view and change payment integrations. */
+  canManageIntegrations: boolean
 }
 export interface AuthResponse {
   accessToken: string; accessTokenExpiresAt: string; refreshToken: string; refreshTokenExpiresAt: string; user: AuthUser
@@ -42,7 +44,7 @@ export interface Client {
 export interface Trainer {
   id: string; userId: string; phone: string; firstName: string; lastName: string; specialization: string | null
   bio: string | null; experienceYears: number | null; isAcceptingClients: boolean; isActive: boolean
-  userStatus: UserStatus; clientsCount: number; createdAt: string
+  userStatus: UserStatus; clientsCount: number; createdAt: string; photoUrl: string | null
 }
 
 export interface TrainerRequest {
@@ -69,3 +71,19 @@ export interface Report {
   sessionsByStatus: CountByKey[]
   trainers: { trainerId: string; name: string; clients: number; sessionsCompleted: number; requestsReceived: number }[]
 }
+
+export type IntegrationProvider = 'Click' | 'Payme'
+export type IntegrationMode = 'Test' | 'Production'
+export type IntegrationStatus = 'NotConfigured' | 'Configured' | 'NeedsVerification' | 'Active'
+
+/** Secrets never come from the API: only whether one is set and a fixed mask. */
+export interface IntegrationSecretState { isSet: boolean; isReadable: boolean; mask: string | null; updatedAt: string | null }
+export interface IntegrationModeState {
+  values: Record<string, string | null>; secrets: Record<string, IntegrationSecretState>; missingFields: string[]
+}
+export interface Integration {
+  provider: IntegrationProvider; status: IntegrationStatus; isEnabled: boolean; mode: IntegrationMode
+  fields: { name: string; isSecret: boolean }[]; test: IntegrationModeState; production: IntegrationModeState
+  updatedAt: string | null; updatedBy: string | null; lastVerifiedAt: string | null; encryptionConfigured: boolean; version: number
+}
+export interface AuditEntry { createdAt: string; action: string; target: string; details: string | null; userName: string | null }

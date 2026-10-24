@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using Testcontainers.PostgreSql;
 
 namespace FitnessFormulasi.Api.Tests.Infrastructure;
@@ -33,6 +34,12 @@ public sealed class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
     private readonly PostgreSqlContainer _db = new PostgreSqlBuilder("postgres:17-alpine").Build();
     public TestTimeProvider Clock { get; } = new();
 
+    /// <summary>Test-only AES-256 key for integration secrets (32 zero-free bytes, base64).</summary>
+    public static readonly string IntegrationsKey = Convert.ToBase64String(Enumerable.Range(1, 32).Select(i => (byte)i).ToArray());
+
+    /// <summary>Every log line the API writes during the run, to assert that secrets never reach the logs.</summary>
+    public CapturingLoggerProvider Logs { get; } = new();
+
     public static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web) { Converters = { new JsonStringEnumConverter() } };
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -44,6 +51,8 @@ public sealed class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         builder.UseSetting("Bootstrap:AdminPhone", AdminPhone);
         builder.UseSetting("Bootstrap:AdminPassword", AdminPassword);
         builder.UseSetting("RateLimiting:AuthPermitPerMinute", "100000");
+        builder.UseSetting("Integrations:EncryptionKey", IntegrationsKey);
+        builder.ConfigureLogging(l => l.AddProvider(Logs));
         builder.ConfigureServices(s =>
         {
             s.RemoveAll<TimeProvider>();
@@ -100,4 +109,21 @@ public sealed class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 public class ApiCollection : ICollectionFixture<ApiFactory>
 {
     public const string Name = "api";
+}
+
+public sealed class CapturingLoggerProvider : ILoggerProvider
+{
+    public System.Collections.Concurrent.ConcurrentQueue<string> Lines { get; } = new();
+
+    public ILogger CreateLogger(string categoryName) => new Logger(this);
+    public void Dispose() { }
+
+    private sealed class Logger(CapturingLoggerProvider owner) : ILogger
+    {
+        public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
+        public bool IsEnabled(LogLevel logLevel) => true;
+
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter) =>
+            owner.Lines.Enqueue(formatter(state, exception) + " " + exception);
+    }
 }

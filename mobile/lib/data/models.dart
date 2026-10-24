@@ -51,6 +51,7 @@ enum MembershipEffectiveStatus { upcoming, active, expired, exhausted, frozen, c
 class Membership {
   Membership({
     required this.id,
+    required this.clientName,
     required this.planName,
     required this.planType,
     required this.startDate,
@@ -62,6 +63,7 @@ class Membership {
   });
   factory Membership.fromJson(Map<String, dynamic> j) => Membership(
     id: j['id'] as String,
+    clientName: j['clientName'] as String? ?? '',
     planName: j['planName'] as String,
     planType: j['planType'] as String,
     startDate: _date(j['startDate'])!,
@@ -71,7 +73,7 @@ class Membership {
     visitsUsed: j['visitsUsed'] as int,
     daysLeft: j['daysLeft'] as int,
   );
-  final String id, planName, planType;
+  final String id, clientName, planName, planType;
   final DateTime startDate, endDate;
   final MembershipEffectiveStatus effectiveStatus;
   final int? visitLimit;
@@ -84,6 +86,35 @@ class Membership {
   int get totalDays => endDate.difference(startDate).inDays + 1;
 }
 
+/// A plan on sale. [price] is in UZS for the whole [durationDays].
+class MembershipPlan {
+  MembershipPlan({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.type,
+    required this.durationDays,
+    required this.visitLimit,
+    required this.price,
+  });
+  factory MembershipPlan.fromJson(Map<String, dynamic> j) => MembershipPlan(
+    id: j['id'] as String,
+    name: j['name'] as String,
+    description: j['description'] as String?,
+    type: j['type'] as String,
+    durationDays: j['durationDays'] as int,
+    visitLimit: j['visitLimit'] as int?,
+    price: (j['price'] as num).toDouble(),
+  );
+  final String id, name, type;
+  final String? description;
+  final int durationDays;
+  final int? visitLimit;
+  final double price;
+
+  bool get isUnlimited => type == 'Unlimited';
+}
+
 class Trainer {
   Trainer({
     required this.id,
@@ -93,6 +124,7 @@ class Trainer {
     this.bio,
     this.experienceYears,
     required this.isAcceptingClients,
+    this.photoUrl,
   });
   factory Trainer.fromJson(Map<String, dynamic> j) => Trainer(
     id: j['id'] as String,
@@ -102,9 +134,13 @@ class Trainer {
     bio: j['bio'] as String?,
     experienceYears: j['experienceYears'] as int?,
     isAcceptingClients: j['isAcceptingClients'] as bool,
+    photoUrl: j['photoUrl'] as String?,
   );
   final String id, firstName, lastName;
   final String? specialization, bio;
+
+  /// Path of the photo on the API (versioned), or null.
+  final String? photoUrl;
   final int? experienceYears;
   final bool isAcceptingClients;
   String get fullName => '$firstName $lastName'.trim();
@@ -221,6 +257,7 @@ class ClientProfile {
     this.birthDate,
     this.gender,
     this.assignedTrainer,
+    this.memberSince,
   });
   factory ClientProfile.fromJson(Map<String, dynamic> j) => ClientProfile(
     id: j['id'] as String,
@@ -232,12 +269,16 @@ class ClientProfile {
     birthDate: _date(j['birthDate']),
     gender: j['gender'] as String?,
     assignedTrainer: _opt(j['assignedTrainer'], Trainer.fromJson),
+    memberSince: _dt(j['memberSince']),
   );
   final String id, phone, firstName, lastName;
   final bool phoneConfirmed;
   final String? email, gender;
   final DateTime? birthDate;
   final Trainer? assignedTrainer;
+
+  /// When the client signed up.
+  final DateTime? memberSince;
 }
 
 class ProfileUpdate {
@@ -290,6 +331,7 @@ class TrainerSelfProfile {
     this.experienceYears,
     required this.isAcceptingClients,
     required this.clientsCount,
+    this.photoUrl,
   });
   factory TrainerSelfProfile.fromJson(Map<String, dynamic> j) => TrainerSelfProfile(
     firstName: j['firstName'] as String,
@@ -300,9 +342,10 @@ class TrainerSelfProfile {
     experienceYears: j['experienceYears'] as int?,
     isAcceptingClients: j['isAcceptingClients'] as bool,
     clientsCount: j['clientsCount'] as int,
+    photoUrl: j['photoUrl'] as String?,
   );
   final String firstName, lastName, phone;
-  final String? specialization, bio;
+  final String? specialization, bio, photoUrl;
   final int? experienceYears;
   final bool isAcceptingClients;
   final int clientsCount;
