@@ -1,0 +1,313 @@
+{
+  "@@locale": "ru",
+  "appName": "Fitness Formulasi",
+  "loginTitle": "С возвращением",
+  "loginSubtitle": "Войдите по номеру телефона",
+  "registerTitle": "Регистрация",
+  "registerSubtitle": "Создайте аккаунт клиента клуба",
+  "phone": "Номер телефона",
+  "password": "Пароль",
+  "confirmPassword": "Повторите пароль",
+  "firstName": "Имя",
+  "lastName": "Фамилия",
+  "email": "Email",
+  "birthDate": "Дата рождения",
+  "gender": "Пол",
+  "genderMale": "Мужской",
+  "genderFemale": "Женский",
+  "notSpecified": "Не указано",
+  "signIn": "Войти",
+  "signUp": "Зарегистрироваться",
+  "noAccount": "Нет аккаунта? Зарегистрируйтесь",
+  "haveAccount": "Уже есть аккаунт? Войти",
+  "smsNotice": "Подтверждение номера по SMS появится в следующем обновлении.",
+  "validationRequired": "Обязательное поле",
+  "validationPhone": "Введите номер в формате +998 90 123 45 67",
+  "validationPassword": "Минимум 8 символов, буквы и цифры",
+  "validationPasswordMatch": "Пароли не совпадают",
+  "validationEmail": "Неверный email",
+  "errorGeneric": "Что-то пошло не так. Попробуйте ещё раз.",
+  "errorNetwork": "Нет соединения с сервером",
+  "errorInvalidCredentials": "Неверный номер или пароль",
+  "errorAccountLocked": "Слишком много попыток. Попробуйте через 15 минут.",
+  "errorAccountBlocked": "Аккаунт заблокирован. Обратитесь в клуб.",
+  "errorPhoneTaken": "Этот номер уже зарегистрирован",
+  "errorDuplicateRequest": "Заявка этому тренеру уже отправлена",
+  "errorTrainerNotAccepting": "Тренер сейчас не принимает новых клиентов",
+  "errorAlreadyAssigned": "Этот тренер уже закреплён за вами",
+  "errorRequestNotPending": "Заявка уже обработана",
+  "errorSessionOverlap": "На это время уже есть тренировка",
+  "errorStartInPast": "Выберите время в будущем",
+  "errorAdminUseWeb": "Администраторы работают в веб-панели",
+  "retry": "Повторить",
+  "save": "Сохранить",
+  "saved": "Сохранено",
+  "cancel": "Отмена",
+  "close": "Закрыть",
+  "confirm": "Подтвердить",
+  "send": "Отправить",
+  "logout": "Выйти",
+  "logoutConfirm": "Выйти из аккаунта?",
+  "language": "Язык",
+  "tabHome": "Главная",
+  "tabMembership": "Абонемент",
+  "tabTrainers": "Тренеры",
+  "tabWorkouts": "Тренировки",
+  "tabProfile": "Профиль",
+  "tabRequests": "Заявки",
+  "tabClients": "Клиенты",
+  "tabSchedule": "Расписание",
+  "greetingMorning": "Доброе утро, {name}",
+  "@greetingMorning": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "greetingDay": "Добрый день, {name}",
+  "@greetingDay": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "greetingEvening": "Добрый вечер, {name}",
+  "@greetingEvening": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "membership": "Абонемент",
+  "noMembership": "Нет действующего абонемента",
+  "noMembershipHint": "Оформите абонемент на ресепшене клуба",
+  "validUntil": "Действует до {date}",
+  "@validUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "startsOn": "Начнётся {date}",
+  "@startsOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "daysLeft": "{count, plural, =0{Сегодня последний день} one{Остался {count} день} few{Осталось {count} дня} many{Осталось {count} дней} other{Осталось {count} дня}}",
+  "@daysLeft": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "daysShort": "дн.",
+  "visitsUsed": "Посещения: {used} из {limit}",
+  "@visitsUsed": {
+    "placeholders": {
+      "used": {
+        "type": "int"
+      },
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
+  "unlimited": "Безлимит",
+  "limitedVisits": "По посещениям",
+  "statusActive": "Активен",
+  "statusUpcoming": "Скоро начнётся",
+  "statusExpired": "Истёк",
+  "statusExhausted": "Посещения исчерпаны",
+  "statusFrozen": "Заморожен",
+  "statusCancelled": "Отменён",
+  "nextMembership": "Следующий абонемент",
+  "membershipHistory": "История абонементов",
+  "period": "Срок действия",
+  "type": "Тип",
+  "nextWorkout": "Ближайшая тренировка",
+  "noUpcomingWorkouts": "Запланированных тренировок нет",
+  "noUpcomingWorkoutsHint": "Тренер назначит тренировку, и она появится здесь",
+  "yourTrainer": "Ваш тренер",
+  "noTrainer": "Тренер не выбран",
+  "chooseTrainer": "Выбрать тренера",
+  "visits": "Посещения",
+  "visitsThisMonth": "В этом месяце",
+  "visitsTotal": "Всего",
+  "lastVisit": "Последнее",
+  "pendingRequestTo": "Заявка тренеру {name} на рассмотрении",
+  "@pendingRequestTo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "trainersTitle": "Тренеры клуба",
+  "noTrainers": "Тренеров пока нет",
+  "experienceYears": "{count, plural, one{Опыт {count} год} few{Опыт {count} года} many{Опыт {count} лет} other{Опыт {count} года}}",
+  "@experienceYears": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "acceptingClients": "Набирает клиентов",
+  "notAcceptingClients": "Набор закрыт",
+  "about": "О тренере",
+  "sendRequest": "Отправить заявку",
+  "requestMessageHint": "Цель тренировок, удобное время (необязательно)",
+  "requestSent": "Заявка отправлена",
+  "cancelRequest": "Отменить заявку",
+  "myRequests": "Мои заявки",
+  "requestPending": "На рассмотрении",
+  "requestAccepted": "Принята",
+  "requestRejected": "Отклонена",
+  "requestCancelled": "Отменена",
+  "trainerComment": "Комментарий: {text}",
+  "@trainerComment": {
+    "placeholders": {
+      "text": {
+        "type": "String"
+      }
+    }
+  },
+  "currentTrainerBadge": "Ваш тренер",
+  "workoutsTitle": "Тренировки",
+  "upcoming": "Предстоящие",
+  "history": "История",
+  "minutes": "{count} мин",
+  "@minutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "withTrainer": "Тренер: {name}",
+  "@withTrainer": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "withClient": "Клиент: {name}",
+  "@withClient": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sessionScheduled": "Запланирована",
+  "sessionCompleted": "Проведена",
+  "sessionCancelled": "Отменена",
+  "profileTitle": "Профиль",
+  "personalData": "Личные данные",
+  "phoneNotConfirmed": "Номер не подтверждён",
+  "phoneChangeHint": "Номер телефона меняется через администратора клуба",
+  "notifications": "Уведомления",
+  "noNotifications": "Уведомлений нет",
+  "markAllRead": "Прочитать все",
+  "notifTrainerRequestReceived": "Новая заявка от клиента",
+  "notifTrainerRequestAccepted": "{name} принял(а) вашу заявку",
+  "@notifTrainerRequestAccepted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "notifTrainerRequestRejected": "{name} отклонил(а) вашу заявку",
+  "@notifTrainerRequestRejected": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "notifTrainingSessionScheduled": "Назначена новая тренировка",
+  "notifTrainingSessionCancelled": "Тренировка отменена",
+  "notifMembershipAssigned": "Оформлен абонемент «{name}»",
+  "@notifMembershipAssigned": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "trainerCabinet": "Кабинет тренера",
+  "incomingRequests": "Входящие заявки",
+  "noRequests": "Заявок нет",
+  "accept": "Принять",
+  "reject": "Отклонить",
+  "commentOptional": "Комментарий клиенту (необязательно)",
+  "myClients": "Мои клиенты",
+  "noClients": "Закреплённых клиентов пока нет",
+  "schedule": "Расписание",
+  "noSessions": "На ближайшие 30 дней тренировок нет",
+  "newSession": "Новая тренировка",
+  "client": "Клиент",
+  "date": "Дата",
+  "time": "Время",
+  "duration": "Длительность",
+  "notes": "Заметки",
+  "create": "Создать",
+  "markCompleted": "Отметить проведённой",
+  "cancelSession": "Отменить тренировку",
+  "specialization": "Специализация",
+  "bio": "О себе",
+  "acceptNewClients": "Принимаю новых клиентов",
+  "lastVisitOn": "Последнее посещение: {date}",
+  "@lastVisitOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "noVisitsYet": "Посещений ещё не было",
+  "clientsCount": "Клиентов: {count}",
+  "@clientsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "todayLabel": "Сегодня",
+  "tomorrowLabel": "Завтра",
+  "changePassword": "Сменить пароль",
+  "changePasswordForcedTitle": "Придумайте свой пароль",
+  "changePasswordForcedText": "Вам выдали временный пароль в клубе. Чтобы продолжить, задайте новый пароль, который знаете только вы.",
+  "currentPassword": "Текущий пароль",
+  "newPassword": "Новый пароль",
+  "passwordChanged": "Пароль изменён",
+  "errorInvalidPassword": "Текущий пароль указан неверно",
+  "errorPasswordUnchanged": "Новый пароль должен отличаться от текущего",
+  "errorPasswordChangeRequired": "Сначала смените временный пароль",
+  "sessionEnded": "Прошла",
+  "workoutsNoTrainerHint": "Выберите тренера — он сможет назначать вам тренировки",
+  "membershipInactiveWarning": "Нет действующего абонемента. Оформите или продлите его на ресепшене клуба.",
+  "pastWeek": "Прошедшие за 7 дней",
+  "clientNoActiveMembership": "У клиента нет действующего абонемента",
+  "markResultHint": "Нажмите, чтобы отметить результат",
+  "cancelSessionConfirm": "Отменить тренировку?",
+  "cancelSessionConfirmBody": "Клиент увидит, что тренировка отменена. Вернуть её будет нельзя.",
+  "keepSession": "Не отменять",
+  "sessionMarkedCompleted": "Тренировка отмечена проведённой",
+  "sessionMarkedCancelled": "Тренировка отменена",
+  "errorSessionNotScheduled": "Тренировка уже отмечена или отменена",
+  "errorSessionNotStarted": "Отметить проведённой можно только после начала тренировки",
+  "errorNotFound": "Запись не найдена или недоступна",
+  "loadMore": "Показать ещё"
+}
