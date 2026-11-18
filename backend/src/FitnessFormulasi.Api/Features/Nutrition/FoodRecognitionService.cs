@@ -41,7 +41,7 @@ public sealed partial class FoodRecognitionService(AiGateway ai, FoodCatalog cat
     {
         var snapshot = await catalog.GetAsync(ct);
         var request = new AiJsonRequest(
-            AiFeature.FoodPhoto, ai.Options.VisionModel, ai.Options.VisionEffort, VisionSystemPrompt(snapshot),
+            AiFeature.FoodPhoto, VisionSystemPrompt(snapshot),
             VisionUserText(hint), [new AiImage(jpeg, "image/jpeg")], VisionSchema(snapshot.DishKeys), ai.Options.VisionMaxTokens);
 
         for (var attempt = 1; ; attempt++)
@@ -227,7 +227,7 @@ public sealed partial class FoodRecognitionService(AiGateway ai, FoodCatalog cat
 
     public async Task<LabelReading> ReadLabelAsync(Guid clientId, byte[] jpeg, CancellationToken ct)
     {
-        var request = new AiJsonRequest(AiFeature.FoodLabel, ai.Options.VisionModel, ai.Options.VisionEffort, LabelSystemPrompt,
+        var request = new AiJsonRequest(AiFeature.FoodLabel, LabelSystemPrompt,
             "Read the nutrition label and package text on this photo.", [new AiImage(jpeg, "image/jpeg")], LabelSchema(),
             ai.Options.VisionMaxTokens);
         for (var attempt = 1; ; attempt++)

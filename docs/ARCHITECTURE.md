@@ -24,7 +24,7 @@ admin (React)   ───┘
 | `Features/Admin/` | Контроллеры администратора, dashboard и отчёты |
 | `Features/Access/` | Вход по лицу: фото клиентов, терминалы Hikvision (ISAPI), синхронизация с абонементами, события проходов |
 | `Features/Nutrition/` | Питание: AI Food Scanner (фото, этикетка, штрихкод), Nutrition Engine, база продуктов и рецептур узбекских блюд, дневник, аналитика, ИИ-консультант и отчёты ([NUTRITION.md](NUTRITION.md)) |
-| `Features/Ai/` | Абстракция ИИ-провайдера `IAiModelClient` (Claude через SDK Anthropic), лимиты, бюджет и учёт стоимости (`AiGateway`) |
+| `Features/Ai/` | Абстракция ИИ-провайдера `IAiModelClient`: ChatGPT через OpenAI Responses API, Claude через SDK Anthropic. Выбор провайдера на лету (`AiConnectionProvider`: админ-панель или конфигурация), настройки и проверка подключения для админ-панели (`AiSettingsService`), лимиты, бюджет и учёт стоимости (`AiGateway`) |
 | `Features/Legal/` | Публичные страницы для магазинов: политика конфиденциальности и удаление аккаунта (`/legal/privacy`, `/legal/delete-account`); реквизиты клуба из настроек `Legal__*` |
 
 ### Мобильное приложение: `mobile/lib`

@@ -42,6 +42,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, TimeProvider t
     public DbSet<NutritionDailySummary> NutritionDailySummaries => Set<NutritionDailySummary>();
     public DbSet<NutritionReport> NutritionReports => Set<NutritionReport>();
     public DbSet<AiUsageRecord> AiUsage => Set<AiUsageRecord>();
+    public DbSet<AiProviderSettings> AiProviderSettings => Set<AiProviderSettings>();
 
     /// <summary>Source of <see cref="ClientProfile.AccessNo"/>.</summary>
     public const string AccessNumberSequence = "ClientAccessNumbers";
@@ -445,6 +446,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, TimeProvider t
         b.Entity<NutritionProfile>(e =>
         {
             e.Property(x => x.Restrictions).HasMaxLength(500);
+            e.Property(x => x.AiConsentProvider).HasMaxLength(16);
             e.Property(x => x.WeightKg).HasPrecision(5, 1);
             e.Property(x => x.HeightCm).HasPrecision(5, 1);
             e.PrimitiveCollection(x => x.Allergies).ElementType(t => t.HasConversion<string>().HasMaxLength(16));
@@ -472,6 +474,18 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, TimeProvider t
             e.Property(x => x.AiModel).HasMaxLength(64);
             e.HasIndex(x => new { x.ClientProfileId, x.Period, x.FromDate, x.Locale });
             e.HasOne<ClientProfile>().WithMany().HasForeignKey(x => x.ClientProfileId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        b.Entity<AiProviderSettings>(e =>
+        {
+            e.Property(x => x.Version).IsRowVersion();
+            e.Property(x => x.Provider).HasMaxLength(16);
+            e.Property(x => x.OpenAiKeyCiphertext).HasMaxLength(4096);
+            e.Property(x => x.AnthropicKeyCiphertext).HasMaxLength(4096);
+            e.Property(x => x.VisionModel).HasMaxLength(64);
+            e.Property(x => x.ChatModel).HasMaxLength(64);
+            e.Property(x => x.MonthlyBudgetUsd).HasPrecision(10, 2);
+            e.Property(x => x.LastCheckJson).HasColumnType("jsonb");
         });
 
         b.Entity<AiUsageRecord>(e =>

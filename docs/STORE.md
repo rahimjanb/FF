@@ -314,9 +314,11 @@ Ilova rus va o‘zbek tillarida. Hisob telefon raqami va parol orqali yaratiladi
 
 Правило 5.1.2(vi) запрещает использовать данные, полученные с камеры или из фотографий, для рекламы и анализа. Приложение использует фото лица только для прохода через турникет, и политика конфиденциальности это прямо указывает.
 
-Раздел «Питание» отправляет фото еды и данные питания внешнему ИИ-сервису (Anthropic, Claude), без имени и телефона.
+Раздел «Питание» отправляет фото еды и данные питания внешнему ИИ-сервису (OpenAI, ChatGPT, или Anthropic, Claude —
+какой подключён в админ-панели), без имени и телефона.
 Правило 5.1.2(i) требует назвать такого получателя и спросить разрешение до передачи. Приложение показывает
-экран согласия с названием сервиса и ссылкой на политику перед первой ИИ-функцией. Сервер без согласия отвечает
+экран согласия с названием сервиса и ссылкой на политику перед первой ИИ-функцией. После смены провайдера согласие
+спрашивается заново, страница политики называет подключённый сервис. Сервер без согласия отвечает
 `ai_consent_required`, согласие можно отозвать ([NUTRITION.md](NUTRITION.md)). Сервис обрабатывает данные по
 поручению клуба, это не отслеживание (Tracking).
 
@@ -324,7 +326,7 @@ Ilova rus va o‘zbek tillarida. Hisob telefon raqami va parol orqali yaratiladi
 
 Общие ответы:
 - данные собираются: да;
-- данные передаются третьим лицам (shared): нет. Терминал в клубе принадлежит клубу, хостинг хранит данные по поручению клуба, ИИ-сервис (Anthropic) анализирует фото еды и данные питания по поручению клуба (service provider), а это не считается передачей. В Open Food Facts уходит только штрихкод;
+- данные передаются третьим лицам (shared): нет. Терминал в клубе принадлежит клубу, хостинг хранит данные по поручению клуба, ИИ-сервис (OpenAI или Anthropic) анализирует фото еды и данные питания по поручению клуба (service provider), а это не считается передачей. В Open Food Facts уходит только штрихкод;
 - данные шифруются при передаче: да (HTTPS);
 - аккаунт можно создать: да, по телефону и паролю;
 - ссылка на удаление аккаунта: `https://<адрес API>/legal/delete-account`;
@@ -379,8 +381,8 @@ saved and a status such as "sending to the turnstile" or "terminal not
 connected yet" - this is expected, the terminal is only in the club's network.
 
 Nutrition (optional): Home tab -> "Питание" (Nutrition). The member photographs
-a meal; after an explicit consent screen naming the AI provider (Anthropic,
-Claude), the photo without metadata is analysed to recognise dishes, ingredients
+a meal with the in-app camera; after an explicit consent screen naming the AI
+provider (OpenAI ChatGPT), the photo without metadata is analysed to recognise dishes, ingredients
 and portion weight. Calories and macronutrients are then computed on our server
 from a food database (USDA FoodData Central, Open Food Facts, package labels),
 not by the AI; the member can correct weights and ingredients and adds the meal
@@ -402,7 +404,8 @@ No SMS code is needed to sign in.
 - оплата на ресепшене, поэтому встроенных покупок нет;
 - вход по лицу — по желанию и с согласием. Вне клуба проверяющий увидит статус ожидания, это нормально;
 - удаление аккаунта: «Профиль» → «Удалить аккаунт»;
-- раздел «Питание»: на сервере для проверки должен быть настроен ключ ИИ (`Ai__Provider`, `Ai__ApiKey`). Без него
+- раздел «Питание»: на сервере для проверки должен быть подключён ИИ (админ-панель → «Интеграции» → «ИИ-анализ еды»,
+  или `Ai__Provider`, `Ai__ApiKey`). Без него
   анализ фото показан как «не подключён», и проверяющий может счесть функцию незаконченной (правило 2.1).
 
 ## 11. Скриншоты и графика
@@ -452,10 +455,12 @@ No SMS code is needed to sign in.
 - [ ] Сборка обращается к боевому API: проверить на телефоне без подключения к Mac.
 - [ ] В боевой базе нет dev-аккаунтов: проверка в [OPERATIONS.md](OPERATIONS.md), раздел 5.
 - [ ] Номер сборки больше, чем у прошлой загрузки.
-- [ ] Раздел «Питание»: на сервере для проверки настроен ключ ИИ (`Ai__Provider=Anthropic`, `Ai__ApiKey`), анализ фото
+- [ ] Раздел «Питание»: ИИ подключён в админ-панели и «Проверить подключение» проходит (или `Ai__Provider`, `Ai__ApiKey`),
+  в Review Notes указан тот же провайдер (OpenAI или Anthropic), анализ фото
   демо-аккаунтом работает, экран согласия на ИИ появляется перед первым анализом ([NUTRITION.md](NUTRITION.md)).
-- [ ] Разрешения. Сканер штрихкодов (`mobile_scanner`) добавляет на Android разрешение `CAMERA` (камера
-  не обязательна для установки). На iOS тексты `NSCameraUsageDescription` и `NSPhotoLibraryUsageDescription`
+- [ ] Разрешения. Сканер штрихкодов (`mobile_scanner`) и камера для еды (`camera`) добавляют на Android разрешение
+  `CAMERA` (камера не обязательна для установки). Разрешение микрофона `RECORD_AUDIO`, которое добавляет плагин
+  `camera`, убрано в манифесте приложения: звук не записывается. На iOS тексты `NSCameraUsageDescription` и `NSPhotoLibraryUsageDescription`
   упоминают фото лица, еду, этикетки и штрихкоды. На Android штрихкод распознаёт Google ML Kit на устройстве;
   ML Kit может отправлять в Google технические метрики. Сверьте ответы Data safety с
   https://developers.google.com/ml-kit/android-data-disclosure перед отправкой.

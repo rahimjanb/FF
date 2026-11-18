@@ -223,7 +223,7 @@ public sealed class NutritionConsultantService(
         while (messages.Count > 0 && messages[0].Role != "user") messages.RemoveAt(0);
 
         var response = await ai.ChatAsync(clientId,
-            new AiChatRequest(AiFeature.Consultant, ai.Options.ChatModel, ai.Options.ChatEffort, SystemPrompt(req.Locale ?? "ru"), messages,
+            new AiChatRequest(AiFeature.Consultant, SystemPrompt(req.Locale ?? "ru"), messages,
                 NutritionDataTools.Definitions, ai.Options.ChatMaxTokens, 6),
             (call, token) => tools.RunAsync(clientId, call, token), ct);
         return new ConsultantReplyDto(response.Text, response.ToolsUsed.Select(NutritionDataTools.Label).Distinct().ToList());
@@ -281,7 +281,7 @@ public sealed class NutritionReportService(
 
         var language = locale == "uz" ? "Uzbek (Latin script)" : "Russian";
         var what = period == NutritionReportPeriod.Day ? "day" : "week";
-        var response = await ai.ChatAsync(clientId, new AiChatRequest(AiFeature.Report, ai.Options.ChatModel, ai.Options.ChatEffort,
+        var response = await ai.ChatAsync(clientId, new AiChatRequest(AiFeature.Report,
             $"""
             You write short nutrition reports for clients of a fitness club in Uzbekistan, in {language}. Use ONLY the
             data given; never invent foods or numbers. Calories are estimates. Not medical advice.

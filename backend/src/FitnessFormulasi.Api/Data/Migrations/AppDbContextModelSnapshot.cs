@@ -217,6 +217,78 @@ namespace FitnessFormulasi.Api.Data.Migrations
                     b.ToTable("AccessEvents");
                 });
 
+            modelBuilder.Entity("FitnessFormulasi.Api.Domain.AiProviderSettings", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AnthropicKeyCiphertext")
+                        .HasMaxLength(4096)
+                        .HasColumnType("character varying(4096)");
+
+                    b.Property<DateTimeOffset?>("AnthropicKeySetAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ChatModel")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<DateTimeOffset?>("ConfigChangedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset?>("LastCheckAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastCheckJson")
+                        .HasColumnType("jsonb");
+
+                    b.Property<bool?>("LastCheckOk")
+                        .HasColumnType("boolean");
+
+                    b.Property<decimal?>("MonthlyBudgetUsd")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)");
+
+                    b.Property<string>("OpenAiKeyCiphertext")
+                        .HasMaxLength(4096)
+                        .HasColumnType("character varying(4096)");
+
+                    b.Property<DateTimeOffset?>("OpenAiKeySetAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Provider")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("UpdatedByUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<string>("VisionModel")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AiProviderSettings");
+                });
+
             modelBuilder.Entity("FitnessFormulasi.Api.Domain.AiUsageRecord", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1701,6 +1773,10 @@ namespace FitnessFormulasi.Api.Data.Migrations
 
                     b.Property<DateTimeOffset?>("AiConsentAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("AiConsentProvider")
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
 
                     b.PrimitiveCollection<string[]>("Allergies")
                         .IsRequired()

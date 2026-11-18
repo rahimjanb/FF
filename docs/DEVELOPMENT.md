@@ -27,9 +27,10 @@ dotnet user-secrets set "Jwt:SigningKey" "$(openssl rand -base64 48)"
 dotnet user-secrets set "Bootstrap:AdminPhone" "+998XXXXXXXXX"
 dotnet user-secrets set "Bootstrap:AdminPassword" "<надёжный пароль>"
 
-# Необязательно: ИИ-анализ фото еды (docs/NUTRITION.md)
-dotnet user-secrets set "Ai:Provider" "Anthropic"
-dotnet user-secrets set "Ai:ApiKey" "<ключ console.anthropic.com>"
+# Необязательно: ИИ-анализ фото еды (docs/NUTRITION.md). Проще задать ключ в админ-панели:
+# «Настройки» → «Интеграции» → «ИИ-анализ еды» (нужен Integrations:EncryptionKey). Или здесь:
+dotnet user-secrets set "Ai:Provider" "OpenAI"   # или Anthropic
+dotnet user-secrets set "Ai:ApiKey" "<ключ platform.openai.com / console.anthropic.com>"
 
 ASPNETCORE_ENVIRONMENT=Development dotnet run --launch-profile http
 ```
@@ -54,7 +55,7 @@ ASPNETCORE_ENVIRONMENT=Development dotnet run --launch-profile http
 | `Integrations__EncryptionKey` | Ключ шифрования секретов интеграций и паролей терминалов (`openssl rand -base64 32`). Без него терминал не добавить |
 | `Access__BackgroundSync` | `false` отключает фоновую синхронизацию терминалов (по умолчанию `true`; в тестах выключена) |
 | `Access__SyncIntervalSeconds` | Как часто синхронизировать терминалы без изменений, по умолчанию 60 секунд (не меньше 10) |
-| `Ai__Provider`, `Ai__ApiKey` | ИИ для раздела «Питание»: `Anthropic` и ключ API (секрет). Без них фото не анализируются, дневник и штрихкоды работают. Остальные `Ai__*` и `FoodData__*` — в [NUTRITION.md](NUTRITION.md) |
+| `Ai__Provider`, `Ai__ApiKey` | ИИ для раздела «Питание»: `OpenAI` (ChatGPT) или `Anthropic` (Claude) и ключ API (секрет). Можно не задавать, а подключить в админ-панели. Без них фото не анализируются, дневник и штрихкоды работают. Остальные `Ai__*` и `FoodData__*` — в [NUTRITION.md](NUTRITION.md) |
 | `FoodData__UsdaApiKey` | Необязательно: поиск в USDA FoodData Central вне встроенной базы продуктов |
 | `Legal__OperatorName`, `Legal__Address`, `Legal__Phone`, `Legal__Email`, `Legal__Telegram`, `Legal__UpdatedOn` | Реквизиты клуба на страницах `/legal/privacy` и `/legal/delete-account`; на них ссылаются магазины приложений. Пустое значение показывается как «—» ([STORE.md](STORE.md), раздел 3.2). `Legal__AiProcessor` — ИИ-сервис в политике |
 

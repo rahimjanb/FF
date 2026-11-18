@@ -1,11 +1,13 @@
 import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 
 import '../../../l10n/gen/app_localizations.dart';
+import 'food_camera_screen.dart';
 
 enum FoodPhotoSource { camera, gallery }
 
@@ -17,8 +19,8 @@ class FoodPhotoException implements Exception {
   final FoodPhotoProblem problem;
 }
 
-/// Returns a JPEG ready for upload, or null when the user cancelled.
-typedef FoodPhotoPicker = Future<Uint8List?> Function(FoodPhotoSource source);
+/// Returns a JPEG ready for upload, or null when the user cancelled. [label]: the photo is of a package label.
+typedef FoodPhotoPicker = Future<Uint8List?> Function(BuildContext context, FoodPhotoSource source, {bool label});
 
 /// The longer side sent for analysis: enough detail for the vision model, which scales larger images down anyway.
 const foodMaxSide = 1568;
@@ -54,14 +56,22 @@ const foodMaxBytes = 1536 * 1024;
   return (null, FoodPhotoProblem.unreadable);
 }
 
-/// Takes a photo with the rear camera or picks one from the gallery and prepares it for upload.
-Future<Uint8List?> pickFoodPhoto(FoodPhotoSource source) async {
+/// Takes a photo with the app's own camera screen ([FoodCameraScreen], never the system camera app) or picks one
+/// from the gallery, and prepares it for upload.
+Future<Uint8List?> pickFoodPhoto(BuildContext context, FoodPhotoSource source, {bool label = false}) {
+  if (source == FoodPhotoSource.gallery) return pickFoodPhotoFromGallery();
+  return Navigator.of(context).push<Uint8List>(
+    MaterialPageRoute(fullscreenDialog: true, builder: (_) => FoodCameraScreen(label: label)),
+  );
+}
+
+/// The system photo picker (only the chosen photo is shared with the app), then the same preparation as a camera shot.
+Future<Uint8List?> pickFoodPhotoFromGallery() async {
   final XFile? file;
   try {
     // The native picker scales and re-encodes first (HEIC from the gallery becomes JPEG), so Dart decodes less.
     file = await ImagePicker().pickImage(
-      source: source == FoodPhotoSource.camera ? ImageSource.camera : ImageSource.gallery,
-      preferredCameraDevice: CameraDevice.rear,
+      source: ImageSource.gallery,
       maxWidth: 2048,
       maxHeight: 2048,
       imageQuality: 90,

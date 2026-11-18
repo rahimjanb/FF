@@ -2652,4 +2652,63 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get askCompare => 'Сравни сегодня со вчера';
+
+  @override
+  String get cameraDishTitle => 'Фото блюда';
+
+  @override
+  String get cameraLabelTitle => 'Фото этикетки';
+
+  @override
+  String get cameraDishHint => 'Вся тарелка в кадре — сверху или под углом';
+
+  @override
+  String get cameraLabelHint => 'Таблица пищевой ценности целиком, без бликов';
+
+  @override
+  String get cameraShutter => 'Сделать снимок';
+
+  @override
+  String get cameraFlashOff => 'Вспышка выключена';
+
+  @override
+  String get cameraFlashAuto => 'Вспышка: авто';
+
+  @override
+  String get cameraFlashOn => 'Вспышка включена';
+
+  @override
+  String cameraZoom(String zoom) {
+    return 'Увеличение $zoom';
+  }
+
+  @override
+  String get cameraProcessing => 'Готовим фото…';
+
+  @override
+  String get cameraNoAccessTitle => 'Нет доступа к камере';
+
+  @override
+  String get cameraNoAccessBody =>
+      'Разрешите приложению доступ к камере в Настройках, чтобы фотографировать еду. Или выберите фото из галереи.';
+
+  @override
+  String get cameraOpenSettings => 'Открыть настройки';
+
+  @override
+  String get cameraUnavailableTitle => 'Камера недоступна';
+
+  @override
+  String get cameraUnavailableBody =>
+      'На этом устройстве нет камеры. Выберите фото из галереи.';
+
+  @override
+  String get cameraFailedTitle => 'Камера не запустилась';
+
+  @override
+  String get cameraFailedBody =>
+      'Попробуйте ещё раз или выберите фото из галереи.';
+
+  @override
+  String get cameraTapToFocus => 'Нажмите на экран, чтобы сфокусироваться';
 }

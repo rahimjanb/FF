@@ -34,7 +34,7 @@ Future<void> startPhotoScan(
   final t = AppLocalizations.of(context);
   final Uint8List? jpeg;
   try {
-    jpeg = await picker(source);
+    jpeg = await picker(context, source, label: mode == ScanMode.label);
   } on FoodPhotoException catch (e) {
     if (context.mounted) showSnack(context, foodPhotoProblemText(t, e.problem));
     return;
@@ -102,7 +102,7 @@ class _ScanPreviewScreenState extends State<ScanPreviewScreen> {
   Future<void> _retake(FoodPhotoSource source) async {
     final t = AppLocalizations.of(context);
     try {
-      final jpeg = await widget.picker(source);
+      final jpeg = await widget.picker(context, source, label: widget.mode == ScanMode.label);
       if (jpeg != null && mounted) {
         setState(() {
           _photo = jpeg;

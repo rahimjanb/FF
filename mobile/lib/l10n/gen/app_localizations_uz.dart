@@ -2588,4 +2588,64 @@ class AppLocalizationsUz extends AppLocalizations {
 
   @override
   String get askCompare => 'Bugunni kecha bilan solishtir';
+
+  @override
+  String get cameraDishTitle => 'Taom surati';
+
+  @override
+  String get cameraLabelTitle => 'Yorliq surati';
+
+  @override
+  String get cameraDishHint =>
+      'Butun likopcha kadrda — tepadan yoki burchak ostida';
+
+  @override
+  String get cameraLabelHint => 'Ozuqaviy qiymat jadvali to‘liq, yaltirashsiz';
+
+  @override
+  String get cameraShutter => 'Suratga olish';
+
+  @override
+  String get cameraFlashOff => 'Chiroq o‘chirilgan';
+
+  @override
+  String get cameraFlashAuto => 'Chiroq: avto';
+
+  @override
+  String get cameraFlashOn => 'Chiroq yoqilgan';
+
+  @override
+  String cameraZoom(String zoom) {
+    return 'Kattalashtirish $zoom';
+  }
+
+  @override
+  String get cameraProcessing => 'Surat tayyorlanmoqda…';
+
+  @override
+  String get cameraNoAccessTitle => 'Kameraga ruxsat yo‘q';
+
+  @override
+  String get cameraNoAccessBody =>
+      'Ovqatni suratga olish uchun Sozlamalarda ilovaga kameradan foydalanishga ruxsat bering. Yoki galereyadan surat tanlang.';
+
+  @override
+  String get cameraOpenSettings => 'Sozlamalarni ochish';
+
+  @override
+  String get cameraUnavailableTitle => 'Kamera mavjud emas';
+
+  @override
+  String get cameraUnavailableBody =>
+      'Bu qurilmada kamera yo‘q. Galereyadan surat tanlang.';
+
+  @override
+  String get cameraFailedTitle => 'Kamera ishga tushmadi';
+
+  @override
+  String get cameraFailedBody =>
+      'Qaytadan urinib ko‘ring yoki galereyadan surat tanlang.';
+
+  @override
+  String get cameraTapToFocus => 'Fokuslash uchun ekranga bosing';
 }

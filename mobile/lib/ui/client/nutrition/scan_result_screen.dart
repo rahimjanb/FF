@@ -418,7 +418,7 @@ class _ScanResultScreenState extends State<ScanResultScreen> {
     final t = AppLocalizations.of(context);
     final Uint8List? jpeg;
     try {
-      jpeg = await widget.picker(FoodPhotoSource.camera);
+      jpeg = await widget.picker(context, FoodPhotoSource.camera);
     } on FoodPhotoException catch (e) {
       if (mounted) showSnack(context, foodPhotoProblemText(t, e.problem));
       return;

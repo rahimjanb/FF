@@ -22,8 +22,11 @@ public sealed class LegalOptions
     public string? Telegram { get; set; }
     /// <summary>Date of the current text of the pages; change it when the text changes.</summary>
     public string UpdatedOn { get; set; } = "18.11.2026";
-    /// <summary>The AI service that analyses food photos (the Ai:Provider in use), named on the privacy page.</summary>
-    public string AiProcessor { get; set; } = "Anthropic PBC (США), сервис Claude";
+    /// <summary>
+    /// The AI service that analyses food photos, named on the privacy page. Empty: the provider in use right now (set in
+    /// the admin panel or Ai:Provider), so the page follows a switch between ChatGPT and Claude by itself.
+    /// </summary>
+    public string? AiProcessor { get; set; }
 }
 
 /// <summary>
@@ -34,17 +37,24 @@ public sealed class LegalOptions
 [Route("legal")]
 [AllowAnonymous]
 [ApiExplorerSettings(IgnoreApi = true)]
-public class LegalController(IOptions<LegalOptions> options) : ControllerBase
+public class LegalController(IOptions<LegalOptions> options, Features.Ai.AiConnectionProvider ai) : ControllerBase
 {
     private static readonly ConcurrentDictionary<string, string> Templates = new();
 
     [HttpGet("privacy")]
-    public ContentResult Privacy() => Page("privacy");
+    public async Task<ContentResult> Privacy(CancellationToken ct) => Page("privacy", await AiProcessorAsync(ct));
 
     [HttpGet("delete-account")]
-    public ContentResult DeleteAccount() => Page("delete-account");
+    public async Task<ContentResult> DeleteAccount(CancellationToken ct) => Page("delete-account", await AiProcessorAsync(ct));
 
-    private ContentResult Page(string name)
+    private async Task<string?> AiProcessorAsync(CancellationToken ct)
+    {
+        if (!string.IsNullOrWhiteSpace(options.Value.AiProcessor)) return options.Value.AiProcessor;
+        var connection = await ai.GetAsync(ct);
+        return connection.IsConfigured ? Features.Ai.AiProviders.Find(connection.Provider)?.LegalName ?? connection.DisplayName : null;
+    }
+
+    private ContentResult Page(string name, string? aiProcessor)
     {
         var o = options.Value;
         var html = Templates.GetOrAdd(name, Load)
@@ -54,7 +64,7 @@ public class LegalController(IOptions<LegalOptions> options) : ControllerBase
             .Replace("{{Email}}", Encode(o.Email))
             .Replace("{{Telegram}}", Encode(o.Telegram))
             .Replace("{{UpdatedOn}}", Encode(o.UpdatedOn))
-            .Replace("{{AiProcessor}}", Encode(o.AiProcessor));
+            .Replace("{{AiProcessor}}", Encode(aiProcessor));
         Response.Headers.CacheControl = "public, max-age=3600";
         Response.Headers.XContentTypeOptions = "nosniff";
         Response.Headers.ContentSecurityPolicy =

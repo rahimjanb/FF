@@ -42,7 +42,7 @@ Future<void> tapVisible(WidgetTester tester, Finder finder) async {
 }
 
 /// The camera of the test: the photo file, prepared exactly like a camera photo.
-Future<Uint8List?> filePicker(FoodPhotoSource source) async {
+Future<Uint8List?> filePicker(BuildContext context, FoodPhotoSource source, {bool label = false}) async {
   final (jpeg, problem) = await compute(prepareFoodPhoto, File(photoPath).readAsBytesSync());
   if (problem != null) throw FoodPhotoException(problem);
   return jpeg;

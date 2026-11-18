@@ -11,31 +11,35 @@ namespace FitnessFormulasi.Api.Features.Ai;
 /// <summary>
 /// Claude through the official Anthropic SDK. Vision answers use structured outputs (the JSON is constrained to the
 /// schema; the business layer still validates it). The consultant runs a manual tool loop. The SDK retries
-/// 408/409/429/5xx and network errors with backoff (<see cref="AiOptions.MaxRetries"/>) within
-/// <see cref="AiOptions.TimeoutSeconds"/>; a policy refusal is retried by the API on its default substitute model
-/// (server-side fallback) when <see cref="AiOptions.RefusalFallback"/> is on.
+/// 408/409/429/5xx and network errors with backoff (<see cref="AiClientSettings.MaxRetries"/>) within
+/// <see cref="AiClientSettings.TimeoutSeconds"/>; a policy refusal is retried by the API on its default substitute model
+/// (server-side fallback) when <see cref="AiClientSettings.RefusalFallback"/> is on.
 /// </summary>
 public sealed class AnthropicAiClient : IAiModelClient
 {
     private const string FallbackBeta = "server-side-fallback-2026-07-01";
-    private readonly AiOptions _options;
+    private readonly AiClientSettings _settings;
     private readonly ILogger<AnthropicAiClient> _logger;
     private readonly AnthropicClient? _client;
 
+    /// <summary>The provider of the "Ai" configuration section (no key or another provider: not configured).</summary>
     public AnthropicAiClient(IOptions<AiOptions> options, ILogger<AnthropicAiClient> logger)
+        : this(AiClientSettings.FromOptions(options.Value, AiProviders.Anthropic), logger) { }
+
+    public AnthropicAiClient(AiClientSettings settings, ILogger<AnthropicAiClient> logger)
     {
-        _options = options.Value;
+        _settings = settings;
         _logger = logger;
-        if (!_options.IsEnabled) return;
-        var retries = Math.Clamp(_options.MaxRetries, 0, 5);
-        var timeout = TimeSpan.FromSeconds(Math.Clamp(_options.TimeoutSeconds, 10, 600));
-        _client = string.IsNullOrWhiteSpace(_options.BaseUrl)
-            ? new AnthropicClient { ApiKey = _options.ApiKey!, MaxRetries = retries, Timeout = timeout }
-            : new AnthropicClient { ApiKey = _options.ApiKey!, MaxRetries = retries, Timeout = timeout, BaseUrl = _options.BaseUrl! };
+        if (string.IsNullOrWhiteSpace(settings.ApiKey)) return;
+        var retries = Math.Clamp(settings.MaxRetries, 0, 5);
+        var timeout = TimeSpan.FromSeconds(Math.Clamp(settings.TimeoutSeconds, 10, 600));
+        _client = string.IsNullOrWhiteSpace(settings.BaseUrl)
+            ? new AnthropicClient { ApiKey = settings.ApiKey, MaxRetries = retries, Timeout = timeout }
+            : new AnthropicClient { ApiKey = settings.ApiKey, MaxRetries = retries, Timeout = timeout, BaseUrl = settings.BaseUrl };
     }
 
     public string DisplayName => "Anthropic (Claude)";
-    public string ProviderId => "Anthropic";
+    public string ProviderId => AiProviders.Anthropic;
     public bool IsConfigured => _client is not null;
 
     public async Task<AiJsonResponse> GenerateJsonAsync(AiJsonRequest request, CancellationToken ct)
@@ -152,7 +156,7 @@ public sealed class AnthropicAiClient : IAiModelClient
             System = new List<BetaTextBlockParam> { new() { Text = system, CacheControl = new BetaCacheControlEphemeral() } },
             Messages = [],
         };
-        return _options.RefusalFallback ? p with { Betas = [FallbackBeta], Fallbacks = new Default() } : p;
+        return _settings.RefusalFallback ? p with { Betas = [FallbackBeta], Fallbacks = new Default() } : p;
     }
 
     private async Task<BetaMessage> SendAsync(AnthropicClient client, MessageCreateParams parameters, CancellationToken ct)
@@ -164,28 +168,37 @@ public sealed class AnthropicAiClient : IAiModelClient
         catch (AnthropicRateLimitException e)
         {
             _logger.LogWarning("Anthropic rate limit: {Message}", e.Message);
-            throw AiException.RateLimited();
+            throw AiException.RateLimited().From(429, "rate_limit_error", "Anthropic 429: " + e.Message);
         }
         catch (Anthropic5xxException e)
         {
             _logger.LogWarning("Anthropic server error: {Message}", e.Message);
-            throw AiException.Unavailable();
+            throw AiException.Unavailable().From(500, "api_error", "Anthropic server error: " + e.Message);
         }
         catch (AnthropicApiException e)
         {
             // 4xx other than 429: a bad request, an invalid key, an unknown model. Logged for the operator.
             _logger.LogError("Anthropic API error: {Message}", e.Message);
-            throw AiException.Unavailable("The AI service rejected the request. The administrator has been notified in the logs.");
+            var status = e switch
+            {
+                AnthropicUnauthorizedException => 401,
+                AnthropicForbiddenException => 403,
+                AnthropicNotFoundException => 404,
+                AnthropicUnprocessableEntityException => 422,
+                _ => 400,
+            };
+            throw AiException.Rejected().From(status, null, "Anthropic: " + e.Message);
         }
         catch (AnthropicIOException e)
         {
             _logger.LogWarning("Anthropic network error: {Message}", e.Message);
-            throw AiException.Unavailable();
+            throw AiException.Unavailable().From(null, "network", "Anthropic could not be reached: " + e.Message);
         }
         catch (TaskCanceledException) when (!ct.IsCancellationRequested)
         {
-            _logger.LogWarning("Anthropic request timed out after {Seconds} s", _options.TimeoutSeconds);
-            throw AiException.Unavailable("The AI service did not answer in time. Try again.");
+            _logger.LogWarning("Anthropic request timed out after {Seconds} s", _settings.TimeoutSeconds);
+            throw AiException.Unavailable("The AI service did not answer in time. Try again.")
+                .From(null, "timeout", $"Anthropic did not answer within {_settings.TimeoutSeconds} s.");
         }
     }
 

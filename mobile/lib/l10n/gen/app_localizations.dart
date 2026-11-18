@@ -4705,6 +4705,114 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Сравни сегодня со вчера'**
   String get askCompare;
+
+  /// No description provided for @cameraDishTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Фото блюда'**
+  String get cameraDishTitle;
+
+  /// No description provided for @cameraLabelTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Фото этикетки'**
+  String get cameraLabelTitle;
+
+  /// No description provided for @cameraDishHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вся тарелка в кадре — сверху или под углом'**
+  String get cameraDishHint;
+
+  /// No description provided for @cameraLabelHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Таблица пищевой ценности целиком, без бликов'**
+  String get cameraLabelHint;
+
+  /// No description provided for @cameraShutter.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сделать снимок'**
+  String get cameraShutter;
+
+  /// No description provided for @cameraFlashOff.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вспышка выключена'**
+  String get cameraFlashOff;
+
+  /// No description provided for @cameraFlashAuto.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вспышка: авто'**
+  String get cameraFlashAuto;
+
+  /// No description provided for @cameraFlashOn.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вспышка включена'**
+  String get cameraFlashOn;
+
+  /// No description provided for @cameraZoom.
+  ///
+  /// In ru, this message translates to:
+  /// **'Увеличение {zoom}'**
+  String cameraZoom(String zoom);
+
+  /// No description provided for @cameraProcessing.
+  ///
+  /// In ru, this message translates to:
+  /// **'Готовим фото…'**
+  String get cameraProcessing;
+
+  /// No description provided for @cameraNoAccessTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нет доступа к камере'**
+  String get cameraNoAccessTitle;
+
+  /// No description provided for @cameraNoAccessBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Разрешите приложению доступ к камере в Настройках, чтобы фотографировать еду. Или выберите фото из галереи.'**
+  String get cameraNoAccessBody;
+
+  /// No description provided for @cameraOpenSettings.
+  ///
+  /// In ru, this message translates to:
+  /// **'Открыть настройки'**
+  String get cameraOpenSettings;
+
+  /// No description provided for @cameraUnavailableTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Камера недоступна'**
+  String get cameraUnavailableTitle;
+
+  /// No description provided for @cameraUnavailableBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'На этом устройстве нет камеры. Выберите фото из галереи.'**
+  String get cameraUnavailableBody;
+
+  /// No description provided for @cameraFailedTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Камера не запустилась'**
+  String get cameraFailedTitle;
+
+  /// No description provided for @cameraFailedBody.
+  ///
+  /// In ru, this message translates to:
+  /// **'Попробуйте ещё раз или выберите фото из галереи.'**
+  String get cameraFailedBody;
+
+  /// No description provided for @cameraTapToFocus.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нажмите на экран, чтобы сфокусироваться'**
+  String get cameraTapToFocus;
 }
 
 class _AppLocalizationsDelegate

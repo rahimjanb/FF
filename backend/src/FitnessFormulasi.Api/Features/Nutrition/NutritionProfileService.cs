@@ -13,9 +13,13 @@ public sealed class NutritionProfileService(AppDbContext db, AiGateway ai, IClub
     {
         var client = await db.ClientProfiles.AsNoTracking().SingleAsync(c => c.Id == clientId, ct);
         var profile = await db.NutritionProfiles.AsNoTracking().SingleOrDefaultAsync(p => p.ClientProfileId == clientId, ct);
+        var connection = await ai.ConnectionAsync(ct);
+        // A consent given for another provider does not count: the app asks again, naming the new recipient.
+        var consentAt = ConsentValid(profile?.AiConsentAt, profile?.AiConsentProvider, connection) ? profile!.AiConsentAt : null;
         return new NutritionProfileDto(
             profile?.Goal, profile?.WeightKg, profile?.HeightCm, profile?.Activity, client.Gender, client.BirthDate,
-            profile?.CustomKcalTarget, profile?.Restrictions, profile?.Allergies ?? [], profile?.AiConsentAt, ai.IsAvailable, ai.DisplayName,
+            profile?.CustomKcalTarget, profile?.Restrictions, profile?.Allergies ?? [], consentAt, connection.IsConfigured,
+            connection.DisplayName,
             ai.DailyLimit(AiFeature.FoodPhoto), await ai.UsedTodayAsync(clientId, AiFeature.FoodPhoto, ct),
             NutritionTargets.Compute(profile, client.Gender, client.BirthDate, clock.Today),
             NutritionTargets.Missing(profile, client.Gender, client.BirthDate));
@@ -56,11 +60,13 @@ public sealed class NutritionProfileService(AppDbContext db, AiGateway ai, IClub
     public async Task<NutritionProfileDto> SetConsentAsync(Guid clientId, bool consent, CancellationToken ct)
     {
         var profile = await EnsureAsync(clientId, ct);
+        var connection = await ai.ConnectionAsync(ct);
         profile.AiConsentAt = consent ? clock.UtcNow : null;
+        profile.AiConsentProvider = consent ? connection.Provider : null;
         db.AuditLog.Add(new AuditLogEntry
         {
             UserId = currentUser.Id, Action = consent ? "nutrition.ai_consent_given" : "nutrition.ai_consent_revoked",
-            Target = $"client:{clientId}", Details = ai.DisplayName,
+            Target = $"client:{clientId}", Details = connection.DisplayName ?? connection.Provider,
         });
         await db.SaveChangesAsync(ct);
         return await GetAsync(clientId, ct);
@@ -68,11 +74,17 @@ public sealed class NutritionProfileService(AppDbContext db, AiGateway ai, IClub
 
     public async Task EnsureAiConsentAsync(Guid clientId, CancellationToken ct)
     {
-        if (!ai.IsAvailable) throw AiException.NotConfigured();
-        var consent = await db.NutritionProfiles.Where(p => p.ClientProfileId == clientId).Select(p => p.AiConsentAt).SingleOrDefaultAsync(ct);
-        if (consent is null)
+        var connection = await ai.ConnectionAsync(ct);
+        if (!connection.IsConfigured) throw AiException.NotConfigured();
+        var consent = await db.NutritionProfiles.Where(p => p.ClientProfileId == clientId)
+            .Select(p => new { p.AiConsentAt, p.AiConsentProvider }).SingleOrDefaultAsync(ct);
+        if (!ConsentValid(consent?.AiConsentAt, consent?.AiConsentProvider, connection))
             throw ApiException.Conflict("ai_consent_required", "Agree to sending photos and nutrition data to the AI service first.");
     }
+
+    /// <summary>Given, and for the provider in use. A consent without a provider dates from when Claude was the only one.</summary>
+    private static bool ConsentValid(DateTimeOffset? at, string? provider, AiConnection connection) =>
+        at is not null && string.Equals(provider ?? AiProviders.Anthropic, connection.Provider, StringComparison.OrdinalIgnoreCase);
 
     private async Task<NutritionProfile> EnsureAsync(Guid clientId, CancellationToken ct)
     {

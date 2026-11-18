@@ -21,7 +21,7 @@
 | Пароль PostgreSQL | `POSTGRES_PASSWORD` в `infrastructure/.env` (не в git), далее в `ConnectionStrings__Default` | compose не стартует без него |
 | Ключ подписи JWT | `Jwt__SigningKey` (`JWT_SIGNING_KEY` в `.env`), не короче 32 символов: `openssl rand -base64 48` | API **не запускается** без ключа (проверено) |
 | Первый администратор | `Bootstrap__AdminPhone`, `Bootstrap__AdminPassword` | пароль временный: при первом входе обязательна смена (проверено) |
-| Ключ API ИИ-сервиса | `Ai__ApiKey` (`AI_API_KEY` в `.env`) вместе с `Ai__Provider=Anthropic` | необязателен: без него анализ фото еды выключен (`ai_not_configured`), дневник и штрихкоды работают. Расходы — в таблице `AiUsage` и в логе, месячный предел `Ai__MonthlyBudgetUsd` ([NUTRITION.md](NUTRITION.md)) |
+| Ключ API ИИ-сервиса | Админ-панель → «Настройки» → «Интеграции» → «ИИ-анализ еды» (ключ хранится зашифрованным, нужен `Integrations__EncryptionKey`). Или `Ai__ApiKey` (`AI_API_KEY` в `.env`) вместе с `Ai__Provider=OpenAI` либо `Anthropic` | необязателен: без него анализ фото еды выключен (`ai_not_configured`), дневник и штрихкоды работают. Расходы — в таблице `AiUsage` и в логе, месячный предел `Ai__MonthlyBudgetUsd` ([NUTRITION.md](NUTRITION.md)) |
 | Ключ шифрования секретов интеграций | `Integrations__EncryptionKey` (`INTEGRATIONS_ENCRYPTION_KEY` в `.env`), 32 байта в base64: `openssl rand -base64 32` | необязателен: без него API работает, но секреты Click/Payme сохранить нельзя (ответ `encryption_not_configured`); неверный формат — API не запускается |
 
 - В репозитории секретов нет: `appsettings.json` содержит пустые значения, `.env` в `.gitignore`.

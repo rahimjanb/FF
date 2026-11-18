@@ -78,10 +78,13 @@ public sealed class AnthropicAiClientTests : IDisposable
     private static readonly object Thinking = new { type = "thinking", thinking = "", signature = "sig-1" };
     private static object Text(string text) => new { type = "text", text };
 
-    private static AiJsonRequest JsonRequest() => new(AiFeature.FoodPhoto, "claude-opus-5-5", "medium", "SYSTEM PROMPT", "Describe the food.",
+    private static AiJsonRequest JsonRequest() => new(AiFeature.FoodPhoto, "SYSTEM PROMPT", "Describe the food.",
         [new AiImage([0xFF, 0xD8, 0xFF, 0xD9], "image/jpeg")],
         new JsonObject { ["type"] = "object", ["additionalProperties"] = false, ["required"] = new JsonArray("a"),
-            ["properties"] = new JsonObject { ["a"] = new JsonObject { ["type"] = "number" } } }, 16000);
+            ["properties"] = new JsonObject { ["a"] = new JsonObject { ["type"] = "number" } } }, 16000)
+    {
+        Model = "claude-opus-5-5", Effort = "medium",
+    };
 
     [Fact]
     public async Task Vision_request_has_the_image_the_schema_cached_instructions_and_the_refusal_fallback()
@@ -156,12 +159,12 @@ public sealed class AnthropicAiClientTests : IDisposable
             new { type = "tool_use", id = "toolu_1", name = "get_diary_day", input = new { date = "2026-11-18" } })));
         _responses.Enqueue((200, Message("end_turn", Text("Сегодня 390 ккал."))));
         var calls = new List<AiToolCall>();
-        var reply = await Client().ChatAsync(new AiChatRequest(AiFeature.Consultant, "claude-opus-5-5", "low", "SYSTEM",
+        var reply = await Client().ChatAsync(new AiChatRequest(AiFeature.Consultant, "SYSTEM",
             [new AiChatMessage("user", "Сколько калорий?")],
             [new AiToolDefinition("get_diary_day", "Diary", new JsonObject
             {
                 ["type"] = "object", ["properties"] = new JsonObject { ["date"] = new JsonObject { ["type"] = "string" } }, ["required"] = new JsonArray("date"),
-            })], 16000, 6),
+            })], 16000, 6) { Model = "claude-opus-5-5", Effort = "low" },
             (call, _) =>
             {
                 calls.Add(call);

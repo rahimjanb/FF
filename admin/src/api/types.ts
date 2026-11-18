@@ -124,6 +124,29 @@ export interface Integration {
 }
 export interface AuditEntry { createdAt: string; action: string; target: string; details: string | null; userName: string | null }
 
+// ---- AI service for the «Питание» section (ChatGPT or Claude) ----
+
+/** Admin: the settings of this panel. Server: the server configuration (Ai__Provider). None: AI is off. */
+export type AiSettingsSource = 'None' | 'Server' | 'Admin'
+/** API keys never come from the API: only whether one is set and its last 4 characters. */
+export interface AiKeyState { isSet: boolean; isReadable: boolean; mask: string | null; updatedAt: string | null }
+export interface AiProviderOption {
+  id: string; name: string; defaultVisionModel: string; defaultChatModel: string; models: string[]; keysUrl: string
+}
+export interface AiCheckStep {
+  step: 'vision' | 'chat'; model: string; ok: boolean; durationMs: number; answer: string | null; errorCode: string | null
+  providerStatus: number | null; providerCode: string | null; billing: boolean; detail: string | null
+}
+export interface AiSettings {
+  isEnabled: boolean; provider: string; visionModel: string | null; chatModel: string | null; monthlyBudgetUsd: number | null
+  keys: Record<string, AiKeyState>; providers: AiProviderOption[]
+  active: { source: AiSettingsSource; provider: string | null; providerName: string | null; visionModel: string | null; chatModel: string | null; monthlyBudgetUsd: number }
+  serverMonthlyBudgetUsd: number
+  usage: { spentUsd: number; requests: number; failed: number; photoScans: number }
+  lastCheck: { at: string; provider: string; ok: boolean; steps: AiCheckStep[] } | null
+  encryptionConfigured: boolean; updatedAt: string | null; updatedBy: string | null; version: number
+}
+
 // ---- Face entry through Hikvision terminals ----
 
 /**

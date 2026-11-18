@@ -17,8 +17,10 @@ final foodJpeg = Uint8List.fromList(img.encodeJpg(img.Image(width: 640, height: 
 /// A picker that returns [foodJpeg] and remembers which source was asked for.
 class FakePicker {
   final sources = <FoodPhotoSource>[];
-  Future<Uint8List?> call(FoodPhotoSource source) async {
+  final labels = <bool>[];
+  Future<Uint8List?> call(BuildContext context, FoodPhotoSource source, {bool label = false}) async {
     sources.add(source);
+    labels.add(label);
     return foodJpeg;
   }
 }

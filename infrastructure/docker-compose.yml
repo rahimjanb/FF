@@ -42,8 +42,8 @@ services:
       # AI Food Scanner (docs/NUTRITION.md). Without AI_API_KEY photo analysis is off; the diary and barcodes still work.
       Ai__Provider: ${AI_PROVIDER:-None}
       Ai__ApiKey: ${AI_API_KEY:-}
-      Ai__VisionModel: ${AI_VISION_MODEL:-claude-opus-5-5}
-      Ai__ChatModel: ${AI_CHAT_MODEL:-claude-opus-5-5}
+      Ai__VisionModel: ${AI_VISION_MODEL:-}
+      Ai__ChatModel: ${AI_CHAT_MODEL:-}
       Ai__MonthlyBudgetUsd: ${AI_MONTHLY_BUDGET_USD:-100}
       FoodData__UsdaApiKey: ${USDA_API_KEY:-}
     volumes:

@@ -49,6 +49,8 @@ public sealed class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
     /// <summary>The AI provider (scripted answers, no tokens spent) and the external food databases.</summary>
     public FakeAi Ai { get; } = new();
     public FakeFoodSources FoodSources { get; } = new();
+    /// <summary>The OpenAI API behind keys set in the admin panel (the server's own provider is <see cref="Ai"/>).</summary>
+    public FakeOpenAi OpenAi { get; } = new();
 
     /// <summary>AI photo scans a client may make per day in this run.</summary>
     public const int PhotoScansPerDay = 6;
@@ -81,6 +83,7 @@ public sealed class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
             s.AddSingleton<FitnessFormulasi.Api.Features.Access.IIsapiHandlerFactory>(Terminals);
             s.RemoveAll<FitnessFormulasi.Api.Features.Ai.IAiModelClient>();
             s.AddSingleton<FitnessFormulasi.Api.Features.Ai.IAiModelClient>(Ai);
+            s.AddHttpClient(FitnessFormulasi.Api.Features.Ai.OpenAiClient.HttpClientName).ConfigurePrimaryHttpMessageHandler(() => OpenAi);
             s.RemoveAll<FitnessFormulasi.Api.Features.Nutrition.IBarcodeProductSource>();
             s.AddSingleton<FitnessFormulasi.Api.Features.Nutrition.IBarcodeProductSource>(FoodSources);
             s.RemoveAll<FitnessFormulasi.Api.Features.Nutrition.IFoodSearchSource>();

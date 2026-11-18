@@ -7,16 +7,18 @@ using Microsoft.Extensions.Options;
 namespace FitnessFormulasi.Api.Features.Ai;
 
 /// <summary>
-/// The only way business code reaches the AI provider: checks the client's daily limits and the monthly budget
-/// before a request, and records the tokens, cost and time of every request (successful or not) in AiUsage.
+/// The only way business code reaches the AI provider: picks the provider in use (<see cref="AiConnectionProvider"/>)
+/// and its models, checks the client's daily limits and the monthly budget before a request, and records the tokens,
+/// cost and time of every request (successful or not) in AiUsage.
 /// </summary>
-public sealed class AiGateway(
-    IAiModelClient client, AppDbContext db, IServiceScopeFactory scopes, IOptions<AiOptions> options, IClubClock clock,
+public sealed partial class AiGateway(
+    AiConnectionProvider connections, AppDbContext db, IServiceScopeFactory scopes, IOptions<AiOptions> options, IClubClock clock,
     ILogger<AiGateway> logger)
 {
     public AiOptions Options { get; } = options.Value;
-    public bool IsAvailable => client.IsConfigured;
-    public string? DisplayName => client.IsConfigured ? client.DisplayName : null;
+
+    /// <summary>The provider in use now (it may be switched in the admin panel at any time).</summary>
+    public Task<AiConnection> ConnectionAsync(CancellationToken ct) => connections.GetAsync(ct);
 
     public int DailyLimit(AiFeature feature) => feature switch
     {
@@ -35,39 +37,57 @@ public sealed class AiGateway(
     }
 
     /// <summary>Throws the error the app shows when the request may not be made now.</summary>
-    public async Task EnsureAllowedAsync(Guid clientId, AiFeature feature, CancellationToken ct)
+    public async Task EnsureAllowedAsync(Guid clientId, AiFeature feature, CancellationToken ct) =>
+        await EnsureAllowedAsync(await connections.GetAsync(ct), clientId, feature, ct);
+
+    private async Task EnsureAllowedAsync(AiConnection connection, Guid clientId, AiFeature feature, CancellationToken ct)
     {
-        if (!client.IsConfigured) throw AiException.NotConfigured();
+        if (!connection.IsConfigured) throw AiException.NotConfigured();
         var limit = DailyLimit(feature);
         if (limit > 0 && await UsedTodayAsync(clientId, feature, ct) >= limit)
             throw new AiException(StatusCodes.Status429TooManyRequests, "ai_quota_exceeded",
                 $"The daily limit of {limit} AI requests of this kind is reached. It resets at midnight.");
-        if (Options.MonthlyBudgetUsd > 0)
+        if (connection.MonthlyBudgetUsd > 0)
         {
-            var now = clock.UtcNow;
-            var monthStart = new DateTimeOffset(now.Year, now.Month, 1, 0, 0, 0, TimeSpan.Zero);
-            var spent = await db.AiUsage.Where(u => u.CreatedAt >= monthStart).SumAsync(u => (decimal?)u.CostUsd, ct) ?? 0;
-            if (spent >= Options.MonthlyBudgetUsd)
+            var spent = await SpentThisMonthAsync(ct);
+            if (spent >= connection.MonthlyBudgetUsd)
             {
-                logger.LogWarning("AI monthly budget of {Budget} USD is spent ({Spent} USD); AI requests are paused", Options.MonthlyBudgetUsd, spent);
+                logger.LogWarning("AI monthly budget of {Budget} USD is spent ({Spent} USD); AI requests are paused",
+                    connection.MonthlyBudgetUsd, spent);
                 throw new AiException(StatusCodes.Status503ServiceUnavailable, "ai_budget_exceeded",
                     "AI analysis is paused until next month: the club's monthly limit is reached.");
             }
         }
     }
 
+    /// <summary>Spent on AI requests since the start of the calendar month (UTC), USD.</summary>
+    public async Task<decimal> SpentThisMonthAsync(CancellationToken ct)
+    {
+        var since = MonthStart();
+        return await db.AiUsage.Where(u => u.CreatedAt >= since).SumAsync(u => (decimal?)u.CostUsd, ct) ?? 0;
+    }
+
+    public DateTimeOffset MonthStart()
+    {
+        var now = clock.UtcNow;
+        return new DateTimeOffset(now.Year, now.Month, 1, 0, 0, 0, TimeSpan.Zero);
+    }
+
     public async Task<AiJsonResponse> GenerateJsonAsync(Guid clientId, AiJsonRequest request, CancellationToken ct)
     {
-        await EnsureAllowedAsync(clientId, request.Feature, ct);
+        var connection = await connections.GetAsync(ct);
+        await EnsureAllowedAsync(connection, clientId, request.Feature, ct);
+        request = request with { Model = connection.ModelFor(request.Feature), Effort = connection.EffortFor(request.Feature) };
+        var provider = connection.Provider;
         try
         {
-            var response = await client.GenerateJsonAsync(request, ct);
-            var id = await RecordAsync(clientId, request.Feature, response.Model, response.Usage, response.Duration, null, ct);
+            var response = await connection.Client.GenerateJsonAsync(request, ct);
+            var id = await RecordAsync(clientId, request.Feature, provider, response.Model, response.Usage, response.Duration, null, ct);
             return response with { UsageId = id };
         }
         catch (AiException e)
         {
-            await RecordAsync(clientId, request.Feature, e.Model ?? request.Model, e.Usage, TimeSpan.Zero, e.Code, ct);
+            await RecordAsync(clientId, request.Feature, provider, e.Model ?? request.Model, e.Usage, TimeSpan.Zero, e.Code, ct);
             throw;
         }
     }
@@ -75,16 +95,19 @@ public sealed class AiGateway(
     public async Task<AiChatResponse> ChatAsync(Guid clientId, AiChatRequest request,
         Func<AiToolCall, CancellationToken, Task<string>> runTool, CancellationToken ct)
     {
-        await EnsureAllowedAsync(clientId, request.Feature, ct);
+        var connection = await connections.GetAsync(ct);
+        await EnsureAllowedAsync(connection, clientId, request.Feature, ct);
+        request = request with { Model = connection.ModelFor(request.Feature), Effort = connection.EffortFor(request.Feature) };
+        var provider = connection.Provider;
         try
         {
-            var response = await client.ChatAsync(request, runTool, ct);
-            await RecordAsync(clientId, request.Feature, response.Model, response.Usage, response.Duration, null, ct);
+            var response = await connection.Client.ChatAsync(request, runTool, ct);
+            await RecordAsync(clientId, request.Feature, provider, response.Model, response.Usage, response.Duration, null, ct);
             return response;
         }
         catch (AiException e)
         {
-            await RecordAsync(clientId, request.Feature, e.Model ?? request.Model, e.Usage, TimeSpan.Zero, e.Code, ct);
+            await RecordAsync(clientId, request.Feature, provider, e.Model ?? request.Model, e.Usage, TimeSpan.Zero, e.Code, ct);
             throw;
         }
     }
@@ -101,7 +124,9 @@ public sealed class AiGateway(
 
     public decimal CostOf(string model, AiUsage usage)
     {
-        if (!Options.Prices.TryGetValue(model, out var price))
+        // OpenAI answers with a dated snapshot id (gpt-6.1-terra-2026-10-26): it costs what its model costs.
+        if (!Options.Prices.TryGetValue(model, out var price)
+            && !Options.Prices.TryGetValue(SnapshotSuffix().Replace(model, ""), out price))
         {
             logger.LogWarning("No AI price configured for model {Model}; set Ai__Prices__{Model}__InputPerMTok etc. Cost recorded as 0", model, model);
             return 0;
@@ -110,14 +135,17 @@ public sealed class AiGateway(
                 + usage.CacheReadTokens * price.CacheReadPerMTok + usage.CacheWriteTokens * price.CacheWritePerMTok) / 1_000_000m;
     }
 
+    [System.Text.RegularExpressions.GeneratedRegex(@"-\d{4}-\d{2}-\d{2}$")]
+    private static partial System.Text.RegularExpressions.Regex SnapshotSuffix();
+
     // Written through its own scope, so the caller's unsaved changes are never flushed with it.
-    private async Task<Guid?> RecordAsync(Guid clientId, AiFeature feature, string model, AiUsage usage, TimeSpan duration, string? error,
-        CancellationToken ct)
+    public async Task<Guid?> RecordAsync(Guid? clientId, AiFeature feature, string provider, string model, AiUsage usage,
+        TimeSpan duration, string? error, CancellationToken ct)
     {
         var cost = CostOf(model, usage);
         logger.LogInformation(
             "AI {Feature} {Provider}/{Model}: {Input} in (+{CacheRead} cached, {CacheWrite} cache write), {Output} out, {Cost:F4} USD, {Ms} ms, {Result}",
-            feature, client.ProviderId, model, usage.InputTokens, usage.CacheReadTokens, usage.CacheWriteTokens, usage.OutputTokens,
+            feature, provider, model, usage.InputTokens, usage.CacheReadTokens, usage.CacheWriteTokens, usage.OutputTokens,
             cost, (int)duration.TotalMilliseconds, error ?? "ok");
         try
         {
@@ -125,7 +153,7 @@ public sealed class AiGateway(
             var usageDb = scope.ServiceProvider.GetRequiredService<AppDbContext>();
             var record = new AiUsageRecord
             {
-                ClientProfileId = clientId, Feature = feature, Provider = client.ProviderId, Model = model,
+                ClientProfileId = clientId, Feature = feature, Provider = provider, Model = model,
                 InputTokens = usage.InputTokens, OutputTokens = usage.OutputTokens, CacheReadTokens = usage.CacheReadTokens,
                 CacheWriteTokens = usage.CacheWriteTokens, CostUsd = cost, DurationMs = (int)duration.TotalMilliseconds,
                 Success = error is null, ErrorCode = error,

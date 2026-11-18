@@ -70,15 +70,20 @@ builder.Services.AddScoped<FaceService>();
 builder.Services.AddHostedService<AccessSyncWorker>();
 
 // AI Food Scanner, food diary, nutrition analytics and consultant (Features/Nutrition, Features/Ai).
-// The AI provider is chosen by configuration (Ai__Provider, Ai__ApiKey); without it every AI call answers ai_not_configured.
+// The AI provider (ChatGPT or Claude) is set in the admin panel (Settings → Integrations → AI) or by configuration
+// (Ai__Provider, Ai__ApiKey); without either every AI call answers ai_not_configured.
 builder.Services.Configure<AiOptions>(config.GetSection(AiOptions.Section));
 var aiOptions = config.GetSection(AiOptions.Section).Get<AiOptions>() ?? new AiOptions();
-if (string.Equals(aiOptions.Provider, "Anthropic", StringComparison.OrdinalIgnoreCase) && aiOptions.IsEnabled)
-    builder.Services.AddSingleton<IAiModelClient, AnthropicAiClient>();
-else if (string.Equals(aiOptions.Provider, "None", StringComparison.OrdinalIgnoreCase) || !aiOptions.IsEnabled)
-    builder.Services.AddSingleton<IAiModelClient, DisabledAiClient>();
-else
-    throw new InvalidOperationException($"Ai:Provider '{aiOptions.Provider}' is not supported. Use Anthropic or None.");
+var aiProvider = AiProviders.Find(aiOptions.Provider);
+if (aiProvider is null && !string.Equals(aiOptions.Provider, AiProviders.None, StringComparison.OrdinalIgnoreCase))
+    throw new InvalidOperationException($"Ai:Provider '{aiOptions.Provider}' is not supported. Use OpenAI, Anthropic or None.");
+builder.Services.AddHttpClient(OpenAiClient.HttpClientName, c => c.Timeout = Timeout.InfiniteTimeSpan); // per attempt in the client
+builder.Services.AddSingleton<AiClientFactory>();
+builder.Services.AddSingleton<IAiModelClient>(sp => aiProvider is not null && aiOptions.IsEnabled
+    ? sp.GetRequiredService<AiClientFactory>().Create(aiProvider.Id, AiClientSettings.FromOptions(aiOptions, aiProvider.Id))
+    : new DisabledAiClient());
+builder.Services.AddSingleton<AiConnectionProvider>();
+builder.Services.AddScoped<AiSettingsService>();
 builder.Services.AddScoped<AiGateway>();
 builder.Services.AddMemoryCache();
 builder.Services.Configure<FoodDataOptions>(config.GetSection(FoodDataOptions.Section));

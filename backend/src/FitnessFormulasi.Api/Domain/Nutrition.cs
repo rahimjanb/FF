@@ -46,7 +46,8 @@ public enum NutritionGoal { Lose, Maintain, Gain }
 
 public enum ActivityLevel { Sedentary, Light, Moderate, Active, VeryActive }
 
-public enum AiFeature { FoodPhoto, FoodLabel, Consultant, Report }
+/// <summary>ConnectionCheck: the admin panel's test request to the provider (no client data).</summary>
+public enum AiFeature { FoodPhoto, FoodLabel, Consultant, Report, ConnectionCheck }
 
 public enum NutritionReportPeriod { Day, Week }
 
@@ -333,6 +334,12 @@ public class NutritionProfile : Entity
     public string? Restrictions { get; set; }
     public List<Allergen> Allergies { get; set; } = [];
     public DateTimeOffset? AiConsentAt { get; set; }
+    /// <summary>
+    /// The AI provider the consent was given for ("OpenAI", "Anthropic"). The consent names the recipient of the data,
+    /// so after a switch to another provider the client is asked again. Null: given before this was recorded, when
+    /// Anthropic was the only provider.
+    /// </summary>
+    public string? AiConsentProvider { get; set; }
 }
 
 /// <summary>Totals of one diary day, recomputed whenever an entry of that day changes; analytics read these.</summary>

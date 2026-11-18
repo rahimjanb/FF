@@ -5,6 +5,7 @@ import { useAuth } from '../auth/AuthContext'
 import { Badge, Button, Card, DataState, ErrorBanner, Field, Modal } from '../components/ui'
 import { fmtDateTime } from '../lib/format'
 import { errorMessage, useAsync } from '../lib/useAsync'
+import { AiSettingsCard } from './AiSettingsCard'
 
 const providerInfo: Record<IntegrationProvider, { title: string; description: string }> = {
   Click: {
@@ -46,6 +47,7 @@ export function IntegrationsPage() {
   }
   return (
     <>
+      <AiSettingsCard />
       <div className="banner banner-info">
         Онлайн-оплата — второй этап. Здесь хранятся реквизиты; платежи сейчас не принимаются, абонементы по ним не выдаются.
       </div>

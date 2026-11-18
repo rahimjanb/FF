@@ -1,5 +1,10 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- The food camera (plugin "camera") takes photos only: no sound is recorded, so no microphone permission. -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" tools:node="remove"/>
+    <!-- The app works without a camera (diary, search, gallery photos), so it must install on such devices too. -->
+    <uses-feature android:name="android.hardware.camera.any" android:required="false" tools:replace="android:required"/>
     <application
         android:label="Fitness Formulasi"
         android:name="${applicationName}"
