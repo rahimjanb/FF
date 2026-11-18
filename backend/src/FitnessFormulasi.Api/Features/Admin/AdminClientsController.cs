@@ -52,7 +52,7 @@ public class ClientListQuery : PageQuery
 [Authorize(Roles = RoleNames.Admin)]
 [Produces("application/json")]
 public class AdminClientsController(
-    AppDbContext db, AuthService auth, TokenService tokens, MembershipService memberships) : ControllerBase
+    AppDbContext db, AuthService auth, TokenService tokens, MembershipService memberships, AccountDeletionService deletion) : ControllerBase
 {
     [HttpGet]
     public async Task<PagedResult<ClientAdminDto>> List([FromQuery] ClientListQuery query, CancellationToken ct)
@@ -67,7 +67,8 @@ public class AdminClientsController(
                              || EF.Functions.ILike(c.User.FirstName + " " + c.User.LastName, pattern, "\\")
                              || (digits.Length >= 3 && c.User.Phone.Contains(digits)));
         }
-        if (query.Status is not null) q = q.Where(c => c.User.Status == query.Status);
+        // Deleted accounts only appear when asked for: there is nothing left to manage.
+        q = query.Status is null ? q.Where(c => c.User.Status != UserStatus.Deleted) : q.Where(c => c.User.Status == query.Status);
         if (query.TrainerId is not null) q = q.Where(c => c.AssignedTrainerId == query.TrainerId);
         if (query.HasActiveMembership is not null)
         {
@@ -109,6 +110,9 @@ public class AdminClientsController(
     public async Task<ClientAdminDto> Update(Guid id, AdminUpdateClientRequest req, CancellationToken ct)
     {
         var client = await db.ClientProfiles.Include(c => c.User).SingleOrDefaultAsync(c => c.Id == id, ct) ?? throw ApiException.NotFound("Client");
+        EnsureNotDeleted(client.User);
+        if (req.Status == UserStatus.Deleted)
+            throw ApiException.BadRequest("invalid_status", "Use account deletion to delete a client.");
         var phone = PhoneNumber.Normalize(req.Phone)!;
         if (phone != client.User.Phone)
         {
@@ -128,6 +132,7 @@ public class AdminClientsController(
         client.Gender = req.Gender;
         client.Notes = Clean(req.Notes);
         client.AssignedTrainerId = req.AssignedTrainerId;
+        if (req.AssignedTrainerId is not null) client.WithoutTrainer = false;
         var blocked = client.User.Status != UserStatus.Blocked && req.Status == UserStatus.Blocked;
         client.User.Status = req.Status;
         await db.SaveChangesAsync(ct);
@@ -143,8 +148,26 @@ public class AdminClientsController(
     public async Task<IActionResult> ResetPassword(Guid id, ResetPasswordRequest req, CancellationToken ct)
     {
         var client = await db.ClientProfiles.Include(c => c.User).SingleOrDefaultAsync(c => c.Id == id, ct) ?? throw ApiException.NotFound("Client");
+        EnsureNotDeleted(client.User);
         await auth.ResetByStaffAsync(client.User, req.NewPassword, ct);
         return NoContent();
+    }
+
+    /// <summary>
+    /// Deletes the client's account when they ask the club (e.g. through the deletion page linked from Google Play):
+    /// the same erasure as «Удалить аккаунт» in the app.
+    /// </summary>
+    [HttpPost("{id:guid}/delete")]
+    public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
+    {
+        await deletion.DeleteAsync(id, "by staff at the client's request", ct);
+        return NoContent();
+    }
+
+    internal static void EnsureNotDeleted(User user)
+    {
+        if (user.Status == UserStatus.Deleted)
+            throw ApiException.Conflict("client_deleted", "The client's account has been deleted.");
     }
 
     private async Task EnsureExistsAsync(Guid id, CancellationToken ct)
@@ -157,11 +180,11 @@ public class AdminClientsController(
         var c = await db.ClientProfiles.Where(x => x.Id == id).Select(x => new
         {
             x.Id, x.UserId, x.User.Phone, x.User.PhoneConfirmed, x.User.FirstName, x.User.LastName, x.User.Email,
-            x.BirthDate, x.Gender, x.Notes, x.User.Status, x.CreatedAt,
+            x.BirthDate, x.Gender, x.Notes, x.User.Status, x.CreatedAt, x.WithoutTrainer, x.User.DeletedAt,
             Trainer = x.AssignedTrainer == null ? null : new PersonRef(x.AssignedTrainer.Id, x.AssignedTrainer.User.FirstName, x.AssignedTrainer.User.LastName),
         }).SingleOrDefaultAsync(ct) ?? throw ApiException.NotFound("Client");
         return new ClientAdminDto(c.Id, c.UserId, c.Phone, c.PhoneConfirmed, c.FirstName, c.LastName, c.Email, c.BirthDate, c.Gender,
-            c.Notes, c.Status, c.Trainer, await memberships.CurrentForClientAsync(c.Id, ct), c.CreatedAt);
+            c.Notes, c.Status, c.Trainer, await memberships.CurrentForClientAsync(c.Id, ct), c.CreatedAt, c.WithoutTrainer, c.DeletedAt);
     }
 
     internal static string? Clean(string? s) => string.IsNullOrWhiteSpace(s) ? null : s.Trim();

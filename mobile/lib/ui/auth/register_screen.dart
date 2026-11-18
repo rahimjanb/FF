@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -136,6 +137,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.5))
                             : Text(t.signUp),
                       ),
+                      const SizedBox(height: 12),
+                      const _PolicyConsent(),
+                      const SizedBox(height: 4),
                       TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(t.haveAccount)),
                     ],
                   ),
@@ -145,6 +149,46 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// «Регистрируясь, вы соглашаетесь с Политикой конфиденциальности»; the policy opens in the browser.
+class _PolicyConsent extends StatefulWidget {
+  const _PolicyConsent();
+
+  @override
+  State<_PolicyConsent> createState() => _PolicyConsentState();
+}
+
+class _PolicyConsentState extends State<_PolicyConsent> {
+  late final _open = TapGestureRecognizer()..onTap = () => openPrivacyPolicy(context);
+
+  @override
+  void dispose() {
+    _open.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    final style = Theme.of(context).textTheme.bodySmall;
+    return Text.rich(
+      key: const Key('register-privacy-consent'),
+      TextSpan(
+        style: style,
+        children: [
+          TextSpan(text: t.registerConsentPrefix),
+          TextSpan(
+            text: t.registerConsentLink,
+            style: const TextStyle(color: AppColors.blue, fontWeight: FontWeight.w600),
+            recognizer: _open,
+          ),
+          TextSpan(text: t.registerConsentSuffix),
+        ],
+      ),
+      textAlign: TextAlign.center,
     );
   }
 }

@@ -4,10 +4,12 @@ import { api } from '../api/client'
 import type { Client, Gender, Membership, MembershipPlan, Paged, Trainer, UserStatus, Visit } from '../api/types'
 import { Badge, Button, Card, DataState, ErrorBanner, Field, Modal, PageHeader, Spinner } from '../components/ui'
 import {
-  fmtDate, fmtDateTime, fullName, membershipStatusLabel, membershipStatusTone, planTypeLabel, todayInClub,
+  displayPhone, fmtDate, fmtDateTime, fullName, membershipStatusLabel, membershipStatusTone, planTypeLabel, todayInClub,
+  userStatusLabel, userStatusTone, visitSourceLabel,
 } from '../lib/format'
 import { errorMessage, fieldErrors, useAsync } from '../lib/useAsync'
-import { MembershipActions } from './MembershipsPage'
+import { ClientFaceCard } from './ClientFaceCard'
+import { MembershipActions, MembershipStatusCell } from './MembershipsPage'
 
 export function ClientDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -16,6 +18,7 @@ export function ClientDetailPage() {
   const visits = useAsync(() => api<Paged<Visit>>(`/api/admin/visits?clientId=${id}&pageSize=10`), [id])
   const [assigning, setAssigning] = useState(false)
   const [resetting, setResetting] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const [visitMsg, setVisitMsg] = useState<{ ok: boolean; text: string } | null>(null)
 
   const reloadAll = () => { client.reload(); memberships.reload(); visits.reload() }
@@ -32,43 +35,68 @@ export function ClientDetailPage() {
   if (client.error) return <ErrorBanner message={client.error} onRetry={client.reload} />
   if (!client.data) return <Spinner />
   const c = client.data
+  // A deleted account keeps only its history (memberships, visits) for the club's accounting; nothing can be changed.
+  const deleted = c.status === 'Deleted'
 
   return (
     <>
       <PageHeader title={fullName(c)} actions={<>
         <Link to="/clients" className="btn btn-ghost">← К списку</Link>
-        <Button variant="secondary" onClick={() => setResetting(true)}>Сменить пароль</Button>
+        {!deleted && <Button variant="secondary" onClick={() => setResetting(true)}>Сменить пароль</Button>}
       </>} />
+      {deleted && (
+        <div className="banner banner-info" role="status">
+          <span>
+            <b>Аккаунт удалён {fmtDateTime(c.deletedAt)}.</b> Личные данные и фото стёрты, клиент не может войти.
+            Абонементы и посещения сохранены без имени для учёта клуба.
+          </span>
+        </div>
+      )}
       <div className="detail-grid">
-        <Card title="Профиль"><ClientForm client={c} onSaved={client.reload} /></Card>
+        <Card title="Профиль">{deleted
+          ? <div className="kv">
+              <div><span>Телефон</span><b>{displayPhone(c.phone)}</b></div>
+              <div><span>Статус</span><Badge tone={userStatusTone[c.status]}>{userStatusLabel[c.status]}</Badge></div>
+              <div><span>Создан</span><b>{fmtDate(c.createdAt)}</b></div>
+              <div><span>Удалён</span><b>{fmtDateTime(c.deletedAt)}</b></div>
+            </div>
+          : <ClientForm client={c} onSaved={client.reload} />}
+        </Card>
         <div className="stack">
-          <Card title="Текущий абонемент" actions={<Button onClick={() => setAssigning(true)}>+ Назначить</Button>}>
+          <Card title="Текущий абонемент" actions={!deleted && <Button onClick={() => setAssigning(true)}>+ Назначить</Button>}>
             {c.currentMembership ? (
               <div className="kv">
                 <div><span>План</span><b>{c.currentMembership.planName}</b></div>
                 <div><span>Статус</span><Badge tone={membershipStatusTone[c.currentMembership.effectiveStatus]}>{membershipStatusLabel[c.currentMembership.effectiveStatus]}</Badge></div>
                 <div><span>Срок</span><b>{fmtDate(c.currentMembership.startDate)} — {fmtDate(c.currentMembership.endDate)}</b></div>
+                {c.currentMembership.freezeStartDate && c.currentMembership.freezeEndDate &&
+                  <div><span>Заморозка</span><b>{fmtDate(c.currentMembership.freezeStartDate)} — {fmtDate(c.currentMembership.freezeEndDate)}</b></div>}
                 <div><span>Осталось дней</span><b>{c.currentMembership.daysLeft}</b></div>
+                <div><span>Заморозки</span><b>{c.currentMembership.freezesAllowed === 0
+                  ? 'недоступны (абонемент короче 6 месяцев)'
+                  : `${c.currentMembership.freezesUsed} из ${c.currentMembership.freezesAllowed}`}</b></div>
                 {c.currentMembership.visitLimit !== null &&
                   <div><span>Посещения</span><b>{c.currentMembership.visitsUsed} из {c.currentMembership.visitLimit}</b></div>}
               </div>
             ) : <p className="muted">Нет действующего абонемента.</p>}
-            <div className="row">
+            {!deleted && <div className="row">
               <Button variant="secondary" onClick={recordVisit}>Отметить посещение</Button>
               {visitMsg && <span className={visitMsg.ok ? 'ok' : 'field-error'}>{visitMsg.text}</span>}
-            </div>
+            </div>}
           </Card>
           <Card title="Последние посещения">
             <DataState loading={visits.loading} error={visits.error} empty={!!visits.data && visits.data.items.length === 0}>
-              <ul className="list">{visits.data?.items.map(v => <li key={v.id}>{fmtDateTime(v.visitedAt)}</li>)}</ul>
+              <ul className="list">{visits.data?.items.map(v =>
+                <li key={v.id}>{fmtDateTime(v.visitedAt)} <span className="muted small">· {visitSourceLabel[v.source]}</span></li>)}</ul>
             </DataState>
           </Card>
+          {!deleted && <ClientFaceCard clientId={c.id} />}
         </div>
       </div>
       <Card title="История абонементов">
         <DataState loading={memberships.loading} error={memberships.error} empty={!!memberships.data && memberships.data.length === 0} onRetry={memberships.reload}>
           <table className="table">
-            <thead><tr><th>План</th><th>Начало</th><th>Окончание</th><th>Посещения</th><th>Статус</th><th /></tr></thead>
+            <thead><tr><th>План</th><th>Начало</th><th>Окончание</th><th>Посещения</th><th>Статус</th>{!deleted && <th />}</tr></thead>
             <tbody>
               {memberships.data?.map(m => (
                 <tr key={m.id}>
@@ -76,14 +104,26 @@ export function ClientDetailPage() {
                   <td>{fmtDate(m.startDate)}</td>
                   <td>{fmtDate(m.endDate)}</td>
                   <td>{m.visitLimit !== null ? `${m.visitsUsed} / ${m.visitLimit}` : m.visitsUsed}</td>
-                  <td><Badge tone={membershipStatusTone[m.effectiveStatus]}>{membershipStatusLabel[m.effectiveStatus]}</Badge></td>
-                  <td><MembershipActions membership={m} onChanged={reloadAll} /></td>
+                  <td><MembershipStatusCell membership={m} /></td>
+                  {!deleted && <td><MembershipActions membership={m} onChanged={reloadAll} /></td>}
                 </tr>
               ))}
             </tbody>
           </table>
         </DataState>
       </Card>
+      {!deleted && (
+        <Card title="Удаление аккаунта">
+          <div className="danger-zone">
+            <span className="muted">
+              Если клиент просит удалить его данные (например, через страницу удаления из Google Play), удалите аккаунт здесь.
+              Клиент может удалить его и сам в приложении: Профиль → Удалить аккаунт.
+            </span>
+            <Button variant="danger" onClick={() => setDeleting(true)}>Удалить аккаунт</Button>
+          </div>
+        </Card>
+      )}
+      {deleting && <DeleteClientModal client={c} onClose={() => setDeleting(false)} onDone={() => { setDeleting(false); reloadAll() }} />}
       {assigning && <AssignMembershipModal clientId={c.id} onClose={() => setAssigning(false)} onDone={() => { setAssigning(false); reloadAll() }} />}
       {resetting && <ResetPasswordModal url={`/api/admin/clients/${c.id}/reset-password`} onClose={() => setResetting(false)} />}
     </>
@@ -144,7 +184,7 @@ function ClientForm({ client, onSaved }: { client: Client; onSaved(): void }) {
           <option value="Active">Активен</option><option value="Blocked">Заблокирован</option>
         </select></Field>
       </div>
-      <Field label="Тренер"><select value={form.assignedTrainerId} onChange={set('assignedTrainerId')}>
+      <Field label="Тренер" hint={client.withoutTrainer && !client.assignedTrainer ? 'Клиент выбрал в приложении «Без тренера»' : undefined}><select value={form.assignedTrainerId} onChange={set('assignedTrainerId')}>
         <option value="">Не назначен</option>
         {client.assignedTrainer && !trainers.some(t => t.id === client.assignedTrainer!.id) &&
           <option value={client.assignedTrainer.id}>{fullName(client.assignedTrainer)}</option>}
@@ -158,6 +198,38 @@ function ClientForm({ client, onSaved }: { client: Client; onSaved(): void }) {
         <Button type="submit" disabled={busy}>Сохранить</Button>
       </div>
     </form>
+  )
+}
+
+function DeleteClientModal({ client, onClose, onDone }: { client: Client; onClose(): void; onDone(): void }) {
+  const [error, setError] = useState<string | null>(null)
+  const [busy, setBusy] = useState(false)
+
+  async function submit() {
+    setBusy(true); setError(null)
+    try {
+      await api(`/api/admin/clients/${client.id}/delete`, { method: 'POST' })
+      onDone()
+    } catch (err) { setError(errorMessage(err)) } finally { setBusy(false) }
+  }
+
+  return (
+    <Modal title="Удалить аккаунт клиента?" onClose={onClose}>
+      <div className="form">
+        <ErrorBanner message={error} />
+        <p><b>{fullName(client)}</b>, {displayPhone(client.phone)}</p>
+        <ul className="bullets">
+          <li>Стираются имя, телефон, email, дата рождения, пол, заметки и фото лица; клиент убирается с турникетов.</li>
+          <li>Клиент выходит из приложения на всех устройствах. Заявки и будущие тренировки отменяются, тренер снимается.</li>
+          <li>Абонементы, оплаты и посещения остаются без имени — они нужны для учёта клуба. Остаток дней и посещений сгорает.</li>
+          <li>Отменить удаление нельзя. Номер телефона освободится для новой регистрации.</li>
+        </ul>
+        <div className="form-actions">
+          <Button type="button" variant="secondary" onClick={onClose}>Отмена</Button>
+          <Button type="button" variant="danger" disabled={busy} onClick={submit}>Удалить навсегда</Button>
+        </div>
+      </div>
+    </Modal>
   )
 }
 

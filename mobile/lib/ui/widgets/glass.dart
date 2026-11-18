@@ -1,37 +1,57 @@
+import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../core/config.dart';
 import '../theme.dart';
 
 /// Liquid Glass building blocks: frosted cards over a softly lit background.
 
+/// One blurred color spot of [GlassBackground], positioned from the left or right edge of the screen.
+class GlassSpot {
+  const GlassSpot({this.left, this.right, required this.top, required this.size, required this.color});
+  final double? left, right;
+  final double top;
+  final Size size;
+  final Color color;
+}
+
 /// Static blurred color spots under the content so glass surfaces have something to refract.
 class GlassBackground extends StatelessWidget {
-  const GlassBackground({super.key, required this.child});
+  const GlassBackground({super.key, required this.child, this.spots});
   final Widget child;
+
+  /// Spots instead of the default layout of the tab screens.
+  final List<GlassSpot>? spots;
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
-    Widget spot({
-      double? left,
-      double? right,
-      required double top,
-      required double w,
-      required double h,
-      required Color c,
-    }) => Positioned(
-      left: left,
-      right: right,
-      top: top,
-      child: Container(
-        width: w,
-        height: h,
-        decoration: BoxDecoration(color: c, shape: BoxShape.circle),
-      ),
-    );
+    final spots =
+        this.spots ??
+        [
+          GlassSpot(right: -90, top: -60, size: const Size(300, 280), color: Brand.accent.withValues(alpha: 0.6)),
+          GlassSpot(
+            left: -150,
+            top: size.height * 0.36,
+            size: const Size(320, 320),
+            color: Brand.glowBlue.withValues(alpha: 0.55),
+          ),
+          GlassSpot(
+            right: -110,
+            top: size.height * 0.62,
+            size: const Size(280, 260),
+            color: Brand.glowCyan.withValues(alpha: 0.4),
+          ),
+          GlassSpot(
+            left: -90,
+            top: size.height * 0.86,
+            size: const Size(260, 200),
+            color: Brand.glowRoyal.withValues(alpha: 0.35),
+          ),
+        ];
     return ColoredBox(
       color: Brand.background,
       child: Stack(
@@ -42,28 +62,17 @@ class GlassBackground extends StatelessWidget {
                 imageFilter: ImageFilter.blur(sigmaX: 45, sigmaY: 45, tileMode: TileMode.decal),
                 child: Stack(
                   children: [
-                    spot(right: -90, top: -60, w: 300, h: 280, c: Brand.accent.withValues(alpha: 0.6)),
-                    spot(
-                      left: -150,
-                      top: size.height * 0.36,
-                      w: 320,
-                      h: 320,
-                      c: Brand.glowBlue.withValues(alpha: 0.55),
-                    ),
-                    spot(
-                      right: -110,
-                      top: size.height * 0.62,
-                      w: 280,
-                      h: 260,
-                      c: Brand.glowCyan.withValues(alpha: 0.4),
-                    ),
-                    spot(
-                      left: -90,
-                      top: size.height * 0.86,
-                      w: 260,
-                      h: 200,
-                      c: Brand.glowRoyal.withValues(alpha: 0.35),
-                    ),
+                    for (final s in spots)
+                      Positioned(
+                        left: s.left,
+                        right: s.right,
+                        top: s.top,
+                        child: Container(
+                          width: s.size.width,
+                          height: s.size.height,
+                          decoration: BoxDecoration(color: s.color, shape: BoxShape.circle),
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -85,14 +94,20 @@ class GlassCard extends StatelessWidget {
     this.padding = const EdgeInsets.all(16),
     this.onTap,
     this.glow = false,
+    this.glowCenter = const Alignment(1.1, -1.1),
+    this.borderColor,
   });
   final Widget child;
   final double radius;
   final EdgeInsetsGeometry padding;
   final VoidCallback? onTap;
 
-  /// Radial accent glow in the top right corner (hero card).
+  /// Radial accent glow, by default from the top right corner (hero card).
   final bool glow;
+  final Alignment glowCenter;
+
+  /// Stroke color instead of the default white 14% (e.g. an accent outline for a highlighted card).
+  final Color? borderColor;
 
   @override
   Widget build(BuildContext context) {
@@ -105,14 +120,14 @@ class GlassCard extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: shape,
             gradient: Brand.glassGradient,
-            border: Border.all(color: Brand.glassStroke),
+            border: Border.all(color: borderColor ?? Brand.glassStroke),
           ),
           child: DecoratedBox(
             decoration: BoxDecoration(
               borderRadius: shape,
               gradient: glow
                   ? RadialGradient(
-                      center: const Alignment(1.1, -1.1),
+                      center: glowCenter,
                       radius: 1.1,
                       colors: [Brand.accent.withValues(alpha: 0.27), Brand.accent.withValues(alpha: 0)],
                     )
@@ -143,9 +158,11 @@ class GlassCircleButton extends StatelessWidget {
     this.onTap,
     this.tooltip,
     this.dot = false,
+    this.iconColor = Brand.textPrimary,
   });
   final IconData icon;
   final double size, iconSize;
+  final Color iconColor;
   final VoidCallback? onTap;
   final String? tooltip;
 
@@ -165,7 +182,7 @@ class GlassCircleButton extends StatelessWidget {
             onTap: onTap,
             child: SizedBox.square(
               dimension: size,
-              child: Icon(icon, size: iconSize, color: Brand.textPrimary),
+              child: Icon(icon, size: iconSize, color: iconColor),
             ),
           ),
           if (dot)
@@ -259,52 +276,83 @@ class GlassSectionHeader extends StatelessWidget {
   }
 }
 
-/// Capsule button with the brand gradient and white text.
+/// Capsule button with the brand gradient and white text; [onPressed] null dims it to 40%, [loading] shows a spinner.
 class GradientPillButton extends StatelessWidget {
-  const GradientPillButton({super.key, required this.label, this.icon, required this.onPressed, this.height = 46});
+  const GradientPillButton({
+    super.key,
+    required this.label,
+    this.icon,
+    required this.onPressed,
+    this.height = 46,
+    this.fontSize = 16,
+    this.loading = false,
+  });
   final String label;
   final IconData? icon;
-  final VoidCallback onPressed;
-  final double height;
+  final VoidCallback? onPressed;
+  final double height, fontSize;
+  final bool loading;
 
   @override
-  Widget build(BuildContext context) => PressScale(
-    child: DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: Brand.buttonGradient,
-        borderRadius: BorderRadius.circular(height / 2),
-        boxShadow: [BoxShadow(color: Brand.accent.withValues(alpha: 0.35), blurRadius: 24, offset: const Offset(0, 8))],
-      ),
-      child: Material(
-        type: MaterialType.transparency,
-        child: InkWell(
-          onTap: () {
-            HapticFeedback.lightImpact();
-            onPressed();
-          },
-          borderRadius: BorderRadius.circular(height / 2),
-          child: Container(
-            height: height,
-            padding: const EdgeInsets.symmetric(horizontal: 18),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Flexible(
-                  child: Text(
-                    label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700),
-                  ),
-                ),
-                if (icon != null) ...[const SizedBox(width: 8), Icon(icon, color: Colors.white, size: 20)],
-              ],
+  Widget build(BuildContext context) {
+    final enabled = onPressed != null && !loading;
+    return PressScale(
+      enabled: enabled,
+      child: AnimatedOpacity(
+        opacity: onPressed == null ? 0.4 : 1,
+        duration: const Duration(milliseconds: 200),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: Brand.buttonGradient,
+            borderRadius: BorderRadius.circular(height / 2),
+            boxShadow: [
+              BoxShadow(color: Brand.accent.withValues(alpha: 0.35), blurRadius: 24, offset: const Offset(0, 8)),
+            ],
+          ),
+          child: Material(
+            type: MaterialType.transparency,
+            child: InkWell(
+              onTap: enabled
+                  ? () {
+                      HapticFeedback.lightImpact();
+                      onPressed!();
+                    }
+                  : null,
+              borderRadius: BorderRadius.circular(height / 2),
+              child: Container(
+                height: height,
+                padding: const EdgeInsets.symmetric(horizontal: 18),
+                child: loading
+                    ? Center(
+                        child: Semantics(
+                          label: label,
+                          child: const SizedBox.square(
+                            dimension: 22,
+                            child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
+                          ),
+                        ),
+                      )
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              label,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(color: Colors.white, fontSize: fontSize, fontWeight: FontWeight.w700),
+                            ),
+                          ),
+                          if (icon != null) ...[const SizedBox(width: 8), Icon(icon, color: Colors.white, size: 20)],
+                        ],
+                      ),
+              ),
             ),
           ),
         ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 /// Glass capsule button; [onPressed] null renders it disabled with an optional [badge] (e.g. «скоро»).
@@ -677,11 +725,13 @@ class _GlassSkeletonState extends State<GlassSkeleton> with SingleTickerProvider
   );
 }
 
-/// Dark glass bottom sheet with a grab handle.
+/// Dark glass bottom sheet with a grab handle; as tall as its content, up to 90% of the screen.
 Future<T?> showGlassSheet<T>(BuildContext context, {required WidgetBuilder builder}) => showModalBottomSheet<T>(
   context: context,
   backgroundColor: const Color(0xFF141418),
   showDragHandle: true,
+  isScrollControlled: true,
+  constraints: BoxConstraints(maxHeight: MediaQuery.sizeOf(context).height * 0.9),
   shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(Brand.radiusHero))),
   builder: (context) => SafeArea(
     child: Padding(
@@ -794,4 +844,59 @@ class _TabButton extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Photo (or initials / an icon) inside a sweep-gradient ring #1FACD8 → #2340E0 → #5AD2F4.
+class GlassRingAvatar extends StatelessWidget {
+  const GlassRingAvatar({
+    super.key,
+    required this.size,
+    this.photoUrl,
+    required this.initials,
+    this.icon,
+    this.ring = 2,
+  });
+  final double size, ring;
+
+  /// Photo path from the API; the initials stay visible if it fails to load.
+  final String? photoUrl;
+  final String initials;
+  final IconData? icon;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    width: size,
+    height: size,
+    padding: EdgeInsets.all(ring),
+    decoration: const BoxDecoration(
+      shape: BoxShape.circle,
+      gradient: SweepGradient(
+        transform: GradientRotation(-math.pi / 2),
+        colors: [Brand.accent, Brand.glowBlue, Brand.clock, Brand.accent],
+      ),
+    ),
+    child: Container(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: Brand.background, width: 1.5),
+        gradient: const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFF123349), Color(0xFF0B1024)],
+        ),
+        image: photoUrl == null
+            ? null
+            : DecorationImage(image: NetworkImage(AppConfig.resolve(photoUrl!)), fit: BoxFit.cover, onError: (_, _) {}),
+      ),
+      alignment: Alignment.center,
+      child: photoUrl != null
+          ? null
+          : icon != null
+          ? Icon(icon, color: Brand.clock, size: size * 0.4)
+          : Text(
+              initials,
+              style: TextStyle(color: Brand.clock, fontSize: size * 0.3, fontWeight: FontWeight.w700),
+            ),
+    ),
+  );
 }

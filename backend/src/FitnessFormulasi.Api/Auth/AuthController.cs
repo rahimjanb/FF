@@ -64,4 +64,8 @@ public class AuthController(AuthService auth, TokenService tokens, ICurrentUser 
 public static class RateLimits
 {
     public const string Auth = "auth";
+    /// <summary>Requests to the AI service (food photos, labels, consultant, reports), per user.</summary>
+    public const string Ai = "ai";
+    /// <summary>Barcode lookups and food search (external databases behind them), per user.</summary>
+    public const string Lookup = "lookup";
 }

@@ -47,6 +47,12 @@ class SessionController extends ChangeNotifier {
     _expire();
   }
 
+  /// Deletes the client's account on the server, then signs out on this device.
+  Future<void> deleteAccount(String password) async {
+    await _auth.deleteAccount(password);
+    _expire();
+  }
+
   Future<void> _signIn(AuthUser u) async {
     if (u.role == 'Admin') {
       await _auth.logout();

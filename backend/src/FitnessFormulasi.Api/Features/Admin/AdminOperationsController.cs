@@ -72,7 +72,7 @@ public class AdminOperationsController(
 
     /// <summary>
     /// Records a visit entered by staff and links it to the membership valid on that day.
-    /// Turnstile integration (automatic visits and access decisions) is stage 2.
+    /// Passes through the face terminals are recorded automatically (Features/Access).
     /// </summary>
     [HttpPost("visits")]
     public async Task<ActionResult<VisitDto>> RecordVisit(RecordVisitRequest req, CancellationToken ct)

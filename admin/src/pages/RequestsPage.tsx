@@ -5,6 +5,7 @@ import type { Paged, TrainerRequest, TrainerRequestStatus } from '../api/types'
 import { Badge, Button, DataState, PageHeader, Pagination } from '../components/ui'
 import { fmtDateTime, fullName, requestStatusLabel, requestStatusTone } from '../lib/format'
 import { errorMessage, useAsync } from '../lib/useAsync'
+import { RequestsTabs } from './MembershipRequestsPage'
 
 const tabs: (TrainerRequestStatus | '')[] = ['Pending', 'Accepted', 'Rejected', 'Cancelled', '']
 
@@ -25,7 +26,8 @@ export function RequestsPage() {
 
   return (
     <>
-      <PageHeader title="Заявки на тренера" />
+      <PageHeader title="Заявки" />
+      <RequestsTabs />
       <div className="tabs">
         {tabs.map(t => (
           <button key={t} className={`tab ${status === t ? 'active' : ''}`} onClick={() => { setPage(1); setStatus(t) }}>

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/api_client.dart';
+import '../../core/config.dart';
 import '../../data/models.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../theme.dart';
@@ -131,7 +133,8 @@ String errorText(AppLocalizations t, Object error) {
     'duplicate_request' => t.errorDuplicateRequest,
     'trainer_not_accepting' => t.errorTrainerNotAccepting,
     'already_assigned' => t.errorAlreadyAssigned,
-    'request_not_pending' => t.errorRequestNotPending,
+    'request_not_pending' || 'membership_request_not_pending' => t.errorRequestNotPending,
+    'membership_request_pending' => t.requestAlreadyPending,
     'session_overlap' => t.errorSessionOverlap,
     'start_in_past' => t.errorStartInPast,
     'session_not_scheduled' => t.errorSessionNotScheduled,
@@ -141,6 +144,36 @@ String errorText(AppLocalizations t, Object error) {
     'invalid_password' => t.errorInvalidPassword,
     'password_unchanged' => t.errorPasswordUnchanged,
     'password_change_required' => t.errorPasswordChangeRequired,
+    'freeze_too_long' => t.errorFreezeTooLong,
+    'freeze_not_available' => t.freezeNotAvailable,
+    'freeze_limit_reached' => t.freezeLimitReached,
+    'freeze_exists' => t.errorFreezeExists,
+    'freeze_in_past' => t.errorFreezeInPast,
+    'freeze_outside_membership' => t.errorFreezeOutside,
+    'trainer_assigned' => t.errorTrainerAssigned,
+    'face_consent_required' => t.faceConsentRequired,
+    'face_invalid_format' => t.errorFaceFormat,
+    'face_too_large' => t.errorFaceTooLarge,
+    'face_bad_size' => t.errorFaceBadSize,
+    // AI Food Scanner, food diary and nutrition analytics.
+    'ai_not_configured' => t.errAiNotConfigured,
+    'ai_consent_required' => t.errAiConsentRequired,
+    'ai_unavailable' => t.errAiUnavailable,
+    'ai_rate_limited' => t.errAiRateLimited,
+    'ai_quota_exceeded' => t.errAiQuotaExceeded,
+    'ai_budget_exceeded' => t.errAiBudgetExceeded,
+    'ai_invalid_response' => t.errAiInvalidResponse,
+    'ai_refused' => t.errAiRefused,
+    'photo_invalid_format' => t.errPhotoFormat,
+    'photo_too_large' => t.errPhotoTooLarge,
+    'photo_bad_size' => t.errPhotoBadSize,
+    'barcode_not_found' => t.errBarcodeNotFound,
+    'barcode_invalid' => t.errBarcodeInvalid,
+    'food_db_unavailable' => t.errFoodDbUnavailable,
+    'item_without_nutrition' => t.errItemWithoutNutrition,
+    'nutrition_profile_incomplete' => t.errProfileIncomplete,
+    'scan_in_progress' => t.errScanInProgress,
+    'validation_failed' => t.errValidation,
     _ => t.errorGeneric,
   };
 }
@@ -148,6 +181,21 @@ String errorText(AppLocalizations t, Object error) {
 void showSnack(BuildContext context, String text) => ScaffoldMessenger.of(context)
   ..hideCurrentSnackBar()
   ..showSnackBar(SnackBar(content: Text(text)));
+
+/// Opens [uri] in its app or the browser; a snack bar says so if nothing can open it.
+Future<void> openExternalLink(BuildContext context, Uri uri) async {
+  final failed = AppLocalizations.of(context).openLinkFailed;
+  final messenger = ScaffoldMessenger.maybeOf(context);
+  var ok = false;
+  try {
+    ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
+  } catch (_) {}
+  if (!ok) messenger?.showSnackBar(SnackBar(behavior: SnackBarBehavior.floating, content: Text(failed)));
+}
+
+/// The club's privacy policy in the browser.
+Future<void> openPrivacyPolicy(BuildContext context) =>
+    openExternalLink(context, Uri.parse(AppConfig.privacyPolicyUrl));
 
 /// Loads data with loading / error / data states and pull-to-refresh support.
 class AsyncView<T> extends StatefulWidget {

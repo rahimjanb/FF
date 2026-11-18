@@ -60,7 +60,8 @@ export async function refreshSession(): Promise<boolean> {
   return refreshing
 }
 
-export async function api<T>(path: string, init: { method?: string; body?: unknown } = {}): Promise<T> {
+/** Sends an authorised request; on 401 refreshes the session once and repeats. Throws ApiError for non-2xx answers. */
+async function request(path: string, init: { method?: string; body?: unknown } = {}): Promise<Response> {
   // FormData (file uploads) is sent as multipart; the browser sets its Content-Type with the boundary.
   const isForm = init.body instanceof FormData
   const send = () => fetch(`${BASE}${path}`, {
@@ -83,8 +84,18 @@ export async function api<T>(path: string, init: { method?: string; body?: unkno
     else { session.clear(); onSessionEnd() }
   }
   if (!res.ok) throw await parseError(res)
+  return res
+}
+
+export async function api<T>(path: string, init: { method?: string; body?: unknown } = {}): Promise<T> {
+  const res = await request(path, init)
   if (res.status === 204) return undefined as T
   return res.json() as Promise<T>
+}
+
+/** A file that needs the bearer token (e.g. a client's face photo), for use with URL.createObjectURL. */
+export async function apiBlob(path: string): Promise<Blob> {
+  return (await request(path)).blob()
 }
 
 export function qs(params: Record<string, string | number | boolean | null | undefined>): string {
@@ -96,3 +107,6 @@ export function qs(params: Record<string, string | number | boolean | null | und
 
 /** Absolute URL of a file served by the API (e.g. a trainer photo URL from a DTO). */
 export const apiUrl = (path: string) => `${BASE}${path}`
+
+/** Full address of an API path as seen from outside, e.g. for a device that posts events to the server. */
+export const absoluteApiUrl = (path: string) => new URL(`${BASE}${path}`, window.location.origin).toString()

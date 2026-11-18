@@ -1,0 +1,1364 @@
+{
+ "note": "Typical recipe compositions (estimates), as-eaten state, grams per 1000 g of the finished dish.",
+ "recipes": [
+  {
+   "key": "plov_tashkent",
+   "dishKey": "plov",
+   "nameRu": "Плов ташкентский",
+   "nameUz": "Toshkent oshi",
+   "nameEn": "Tashkent plov",
+   "aliases": [
+    "плов",
+    "ош",
+    "palov",
+    "osh",
+    "oshi",
+    "to‘y oshi",
+    "свадебный плов",
+    "plov"
+   ],
+   "category": "TraditionalFood",
+   "portionGrams": 350,
+   "yieldGrams": null,
+   "description": "Плов из риса, говядины, жёлтой моркови и нута на хлопковом масле; рис перемешивают с зирваком. Типичная рецептура, оценка.",
+   "ingredients": [
+    {
+     "key": "rice_white_cooked",
+     "grams": 503,
+     "role": "Main"
+    },
+    {
+     "key": "beef_chuck_braised",
+     "grams": 145,
+     "role": "Main"
+    },
+    {
+     "key": "carrot_cooked",
+     "grams": 161,
+     "role": "Main"
+    },
+    {
+     "key": "onion_cooked",
+     "grams": 39,
+     "role": "Main"
+    },
+    {
+     "key": "oil_cottonseed",
+     "grams": 57,
+     "role": "Fat"
+    },
+    {
+     "key": "chickpeas_cooked",
+     "grams": 83,
+     "role": "Main"
+    },
+    {
+     "key": "garlic_raw",
+     "grams": 11,
+     "role": "Garnish"
+    },
+    {
+     "key": "cumin",
+     "grams": 1,
+     "role": "Garnish"
+    }
+   ]
+  },
+  {
+   "key": "plov_samarkand",
+   "dishKey": "plov",
+   "nameRu": "Плов самаркандский",
+   "nameUz": "Samarqand oshi",
+   "nameEn": "Samarkand plov",
+   "aliases": [
+    "плов",
+    "самаркандский плов",
+    "palov",
+    "osh",
+    "samarqand oshi",
+    "plov"
+   ],
+   "category": "TraditionalFood",
+   "portionGrams": 350,
+   "yieldGrams": null,
+   "description": "Плов с бараниной и курдючным жиром; рис кладут слоем и не перемешивают с зирваком, обычно без нута. Типичная рецептура, оценка.",
+   "ingredients": [
+    {
+     "key": "rice_white_cooked",
+     "grams": 556,
+     "role": "Main"
+    },
+    {
+     "key": "lamb_shoulder_braised",
+     "grams": 143,
+     "role": "Main"
+    },
+    {
+     "key": "lamb_fat_cooked",
+     "grams": 30,
+     "role": "Fat"
+    },
+    {
+     "key": "oil_cottonseed",
+     "grams": 46,
+     "role": "Fat"
+    },
+    {
+     "key": "carrot_cooked",
+     "grams": 178,
+     "role": "Main"
+    },
+    {
+     "key": "onion_cooked",
+     "grams": 36,
+     "role": "Main"
+    },
+    {
+     "key": "garlic_raw",
+     "grams": 10,
+     "role": "Garnish"
+    },
+    {
+     "key": "cumin",
+     "grams": 1,
+     "role": "Garnish"
+    }
+   ]
+  },
+  {
+   "key": "plov_fergana",
+   "dishKey": "plov",
+   "nameRu": "Плов ферганский",
+   "nameUz": "Farg‘ona oshi",
+   "nameEn": "Fergana plov",
+   "aliases": [
+    "плов",
+    "ферганский плов",
+    "palov",
+    "osh",
+    "farg‘ona oshi",
+    "plov"
+   ],
+   "category": "TraditionalFood",
+   "portionGrams": 350,
+   "yieldGrams": null,
+   "description": "Тёмный плов с бараниной, курдючным жиром, нутом и сильно обжаренным луком; масла больше, чем в других вариантах. Типичная рецептура, оценка.",
+   "ingredients": [
+    {
+     "key": "rice_white_cooked",
+     "grams": 491,
+     "role": "Main"
+    },
+    {
+     "key": "lamb_shoulder_braised",
+     "grams": 126,
+     "role": "Main"
+    },
+    {
+     "key": "lamb_fat_cooked",
+     "grams": 26,
+     "role": "Fat"
+    },
+    {
+     "key": "oil_cottonseed",
+     "grams": 65,
+     "role": "Fat"
+    },
+    {
+     "key": "carrot_cooked",
+     "grams": 157,
+     "role": "Main"
+    },
+    {
+     "key": "onion_cooked",
+     "grams": 44,
+     "role": "Main"
+    },
+    {
+     "key": "chickpeas_cooked",
+     "grams": 80,
+     "role": "Main"
+    },
+    {
+     "key": "garlic_raw",
+     "grams": 10,
+     "role": "Garnish"
+    },
+    {
+     "key": "cumin",
+     "grams": 1,
+     "role": "Garnish"
+    }
+   ]
+  },
+  {
+   "key": "samsa_tandoor_lamb",
+   "dishKey": "samsa",
+   "nameRu": "Самса тандырная с бараниной",
+   "nameUz": "Tandir somsa",
+   "nameEn": "Tandoor samsa with lamb",
+   "aliases": [
+    "самса",
+    "сомса",
+    "somsa",
+    "samsa",
+    "тандыр самса",
+    "tandir somsa"
+   ],
+   "category": "TraditionalFood",
+   "portionGrams": 120,
+   "yieldGrams": null,
+   "description": "Пресное тесто, прослоенное маслом, с начинкой из рубленой баранины, курдючного жира и лука; печётся в тандыре. Типичная рецептура, оценка.",
+   "ingredients": [
+    {
+     "key": "flatbread_wheat",
+     "grams": 357,
+     "role": "Main"
+    },
+    {
+     "key": "butter",
+     "grams": 30,
+     "role": "Fat"
+    },
+    {
+     "key": "lamb_shoulder_roasted",
+     "grams": 270,
+     "role": "Main"
+    },
+    {
+     "key": "lamb_fat_cooked",
+     "grams": 90,
+     "role": "Fat"
+    },
+    {
+     "key": "onion_cooked",
+     "grams": 250,
+     "role": "Main"
+    },
+    {
+     "key": "cumin",
+     "grams": 3,
+     "role": "Garnish"
+    }
+   ]
+  },
+  {
+   "key": "samsa_puff",
+   "dishKey": "samsa",
+   "nameRu": "Самса слоёная с мясом",
+   "nameUz": "Qatlama somsa",
+   "nameEn": "Puff pastry samsa",
+   "aliases": [
+    "самса",
+    "слоёная самса",
+    "somsa",
+    "samsa",
+    "qatlama somsa"
+   ],
+   "category": "TraditionalFood",
+   "portionGrams": 100,
+   "yieldGrams": null,
+   "description": "Самса из слоёного теста с начинкой из говяжьего фарша, лука и курдючного жира. Типичная рецептура, оценка.",
+   "ingredients": [
+    {
+     "key": "puff_pastry_baked",
+     "grams": 439,
+     "role": "Main"
+    },
+    {
+     "key": "beef_ground_80_cooked",
+     "grams": 307,
+     "role": "Main"
+    },
+    {
+     "key": "onion_cooked",
+     "grams": 219,
+     "role": "Main"
+    },
+    {
+     "key": "lamb_fat_cooked",
+     "grams": 35,
+     "role": "Fat"
+    }
+   ]
+  },
+  {
+   "key": "samsa_pumpkin",
+   "dishKey": "samsa",
+   "nameRu": "Самса с тыквой",
+   "nameUz": "Oshqovoqli somsa",
+   "nameEn": "Pumpkin samsa",
+   "aliases": [
+    "самса",
+    "самса с тыквой",
+    "somsa",
+    "oshqovoqli somsa",
+    "pumpkin samsa"
+   ],
+   "category": "TraditionalFood",
+   "portionGrams": 120,
+   "yieldGrams": null,
+   "description": "Самса с начинкой из тыквы, лука и курдючного жира. Типичная рецептура, оценка.",
+   "ingredients": [
+    {
+     "key": "flatbread_wheat",
+     "grams": 410,
+     "role": "Main"
+    },
+    {
+     "key": "butter",
+     "grams": 21,
+     "role": "Fat"
+    },
+    {
+     "key": "pumpkin_cooked",
+     "grams": 411,
+     "role": "Main"
+    },
+    {
+     "key": "onion_cooked",
+     "grams": 103,
+     "role": "Main"
+    },
+    {
+     "key": "lamb_fat_cooked",
+     "grams": 55,
+     "role": "Fat"
+    }
+   ]
+  },
+  {
+   "key": "manti_lamb",
+   "dishKey": "manti",
+   "nameRu": "Манты с бараниной",
+   "nameUz": "Go‘shtli manti",
+   "nameEn": "Manti with lamb",
+   "aliases": [
+    "манты",
+    "манти",
+    "manti",
+    "мант",
+    "go‘shtli manti"
+   ],
+   "category": "TraditionalFood",
+   "portionGrams": 250,
+   "yieldGrams": null,
+   "description": "Приготовленные на пару манты из тонкого теста с рубленой бараниной, курдючным жиром и большим количеством лука. Типичная рецептура, оценка.",
+   "ingredients": [
+    {
+     "key": "dumpling_dough",
+     "grams": 303,
+     "role": "Main"
+    },
+    {
+     "key": "lamb_shoulder_braised",
+     "grams": 291,
+     "role": "Main"
+    },
+    {
+     "key": "lamb_fat_cooked",
+     "grams": 81,
+     "role": "Fat"
+    },
+    {
+     "key": "onion_cooked",
+     "grams": 323,
+     "role": "Main"
+    },
+    {
+     "key": "black_pepper",
+     "grams": 1,
+     "role": "Garnish"
+    },
+    {
+     "key": "cumin",
+     "grams": 1,
+     "role": "Garnish"
+    }
+   ]
+  },
+  {
+   "key": "manti_pumpkin",
+   "dishKey": "manti",
+   "nameRu": "Манты с тыквой",
+   "nameUz": "Oshqovoqli manti",
+   "nameEn": "Manti with pumpkin",
+   "aliases": [
+    "манты",
+    "манты с тыквой",
+    "manti",
+    "oshqovoqli manti"
+   ],
+   "category": "TraditionalFood",
+   "portionGrams": 250,
+   "yieldGrams": null,
+   "description": "Манты на пару с начинкой из тыквы, лука и курдючного жира. Типичная рецептура, оценка.",
+   "ingredients": [
+    {
+     "key": "dumpling_dough",
+     "grams": 349,
+     "role": "Main"
+    },
+    {
+     "key": "pumpkin_cooked",
+     "grams": 464,
+     "role": "Main"
+    },
+    {
+     "key": "onion_cooked",
+     "grams": 140,
+     "role": "Main"
+    },
+    {
+     "key": "lamb_fat_cooked",
+     "grams": 47,
+     "role": "Fat"
+    }
+   ]
+  },
+  {
+   "key": "lagman_soup",
+   "dishKey": "lagman",
+   "nameRu": "Лагман (суп)",
+   "nameUz": "Suyuq lag‘mon",
+   "nameEn": "Lagman soup",
+   "aliases": [
+    "лагман",
+    "лагмон",
+    "lag‘mon",
+    "lag'mon",
+    "lagman",
+    "суюк лагмон"
+   ],
+   "category": "TraditionalFood",
+   "portionGrams": 450,
+   "yieldGrams": null,
+   "description": "Тянутая лапша с соусом-вайрой из говядины, перца, помидоров, редьки и моркови, залитая бульоном. Типичная рецептура, оценка.",
+   "ingredients": [
+    {
+     "key": "pasta_cooked",
+     "grams": 283,
+     "role": "Main"
+    },
+    {
+     "key": "beef_chuck_braised",
+     "grams": 106,
+     "role": "Main"
+    },
+    {
+     "key": "bell_pepper_cooked",
+     "grams": 71,
+     "role": "Main"
+    },
+    {
+     "key": "tomato_cooked",
+     "grams": 71,
+     "role": "Main"
+    },
+    {
+     "key": "radish_daikon_raw",
+     "grams": 35,
+     "role": "Main"
+    },
+    {
+     "key": "carrot_cooked",
+     "grams": 35,
+     "role": "Main"
+    },
+    {
+     "key": "onion_cooked",
+     "grams": 53,
+     "role": "Main"
+    },
+    {
+     "key": "garlic_raw",
+     "grams": 5,
+     "role": "Garnish"
+    },
+    {
+     "key": "oil_cottonseed",
+     "grams": 21,
+     "role": "Fat"
+    },
+    {
+     "key": "soup_stock_beef",
+     "grams": 320,
+     "role": "Main"
+    }
+   ]
+  },
+  {
+   "key": "lagman_fried",
+   "dishKey": "lagman",
+   "nameRu": "Лагман жареный (куурма-лагман)",
+   "nameUz": "Qovurma lag‘mon",
+   "nameEn": "Fried lagman",
+   "aliases": [
+    "лагман",
+    "жареный лагман",
+    "куурма лагман",
+    "qovurma lag‘mon",
+    "lagman"
+   ],
+   "category": "TraditionalFood",
+   "portionGrams": 350,
+   "yieldGrams": null,
+   "description": "Тянутая лапша, обжаренная в казане вместе с мясом и овощами, без бульона. Типичная рецептура, оценка.",
+   "ingredients": [
+    {
+     "key": "pasta_cooked",
+     "grams": 467,
+     "role": "Main"
+    },
+    {
+     "key": "beef_chuck_braised",
+     "grams": 175,
+     "role": "Main"
+    },
+    {
+     "key": "bell_pepper_cooked",
+     "grams": 87,
+     "role": "Main"
+    },
+    {
+     "key": "tomato_cooked",
+     "grams": 87,
+     "role": "Main"
+    },
+    {
+     "key": "onion_cooked",
+     "grams": 70,
+     "role": "Main"
+    },
+    {
+     "key": "carrot_cooked",
+     "grams": 47,
+     "role": "Main"
+    },
+    {
+     "key": "garlic_raw",
+     "grams": 9,
+     "role": "Garnish"
+    },
+    {
+     "key": "oil_cottonseed",
+     "grams": 58,
+     "role": "Fat"
+    }
+   ]
+  },
+  {
+   "key": "shashlik_lamb",
+   "dishKey": "shashlik",
+   "nameRu": "Шашлык из баранины",
+   "nameUz": "Qo‘y go‘shtidan kabob",
+   "nameEn": "Lamb shashlik",
+   "aliases": [
+    "шашлык",
+    "кабоб",
+    "кебаб",
+    "kabob",
+    "shashlik",
+    "qo‘y kabob"
+   ],
+   "category": "TraditionalFood",
+   "portionGrams": 150,
+   "yieldGrams": null,
+   "description": "Кусочки баранины на шампуре с прослойкой курдючного жира, с маринованным луком. Типичная рецептура, оценка.",
+   "ingredients": [
+    {
+     "key": "lamb_shoulder_grilled",
+     "grams": 817,
+     "role": "Main"
+    },
+    {
+     "key": "lamb_fat_cooked",
+     "grams": 61,
+     "role": "Fat"
+    },
+    {
+     "key": "onion_raw",
+     "grams": 122,
+     "role": "Garnish"
+    }
+   ]
+  },
+  {
+   "key": "shashlik_beef",
+   "dishKey": "shashlik",
+   "nameRu": "Шашлык из говядины",
+   "nameUz": "Mol go‘shtidan kabob",
+   "nameEn": "Beef shashlik",
+   "aliases": [
+    "шашлык",
+    "кабоб",
+    "kabob",
+    "shashlik",
+    "говяжий шашлык"
+   ],
+   "category": "TraditionalFood",
+   "portionGrams": 150,
+   "yieldGrams": null,
+   "description": "Кусочки говядины на шампуре с маринованным луком. Типичная рецептура, оценка.",
+   "ingredients": [
+    {
+     "key": "beef_sirloin_grilled",
+     "grams": 880,
+     "role": "Main"
+    },
+    {
+     "key": "onion_raw",
+     "grams": 120,
+     "role": "Garnish"
+    }
+   ]
+  },
+  {
+   "key": "shashlik_chicken",
+   "dishKey": "shashlik",
+   "nameRu": "Шашлык из курицы",
+   "nameUz": "Tovuq kabob",
+   "nameEn": "Chicken shashlik",
+   "aliases": [
+    "шашлык",
+    "куриный шашлык",
+    "tovuq kabob",
+    "kabob",
+    "shashlik"
+   ],
+   "category": "TraditionalFood",
+   "portionGrams": 150,
+   "yieldGrams": null,
+   "description": "Куриные ножки (бедро с кожей) на шампуре с луком. Типичная рецептура, оценка.",
+   "ingredients": [
+    {
+     "key": "chicken_leg_roasted",
+     "grams": 880,
+     "role": "Main"
+    },
+    {
+     "key": "onion_raw",
+     "grams": 120,
+     "role": "Garnish"
+    }
+   ]
+  },
+  {
+   "key": "shashlik_lyulya",
+   "dishKey": "shashlik",
+   "nameRu": "Люля-кебаб",
+   "nameUz": "Lyulya kabob",
+   "nameEn": "Lyulya kebab",
+   "aliases": [
+    "люля",
+    "люля-кебаб",
+    "lyulya",
+    "lula kabob",
+    "qiyma kabob"
+   ],
+   "category": "TraditionalFood",
+   "portionGrams": 150,
+   "yieldGrams": null,
+   "description": "Рубленая баранина с курдючным жиром и луком на шампуре. Типичная рецептура, оценка.",
+   "ingredients": [
+    {
+     "key": "lamb_ground_cooked",
+     "grams": 780,
+     "role": "Main"
+    },
+    {
+     "key": "lamb_fat_cooked",
+     "grams": 80,
+     "role": "Fat"
+    },
+    {
+     "key": "onion_cooked",
+     "grams": 140,
+     "role": "Main"
+    }
+   ]
+  },
+  {
+   "key": "shashlik_liver",
+   "dishKey": "shashlik",
+   "nameRu": "Шашлык из печени",
+   "nameUz": "Jigar kabob",
+   "nameEn": "Liver shashlik",
+   "aliases": [
+    "шашлык из печени",
+    "жигар кабоб",
+    "jigar kabob",
+    "kabob"
+   ],
+   "category": "TraditionalFood",
+   "portionGrams": 150,
+   "yieldGrams": null,
+   "description": "Кусочки бараньей печени, переложенные курдючным жиром. Типичная рецептура, оценка.",
+   "ingredients": [
+    {
+     "key": "lamb_liver_fried",
+     "grams": 760,
+     "role": "Main"
+    },
+    {
+     "key": "lamb_fat_cooked",
+     "grams": 120,
+     "role": "Fat"
+    },
+    {
+     "key": "onion_raw",
+     "grams": 120,
+     "role": "Garnish"
+    }
+   ]
+  },
+  {
+   "key": "shurpa",
+   "dishKey": "shurpa",
+   "nameRu": "Шурпа",
+   "nameUz": "Sho‘rva",
+   "nameEn": "Shurpa",
+   "aliases": [
+    "шурпа",
+    "шорпа",
+    "шурва",
+    "sho‘rva",
+    "sho'rva",
+    "shurpa"
+   ],
+   "category": "TraditionalFood",
+   "portionGrams": 450,
+   "yieldGrams": null,
+   "description": "Наваристый суп из баранины с картофелем, морковью, луком, помидорами, перцем и нутом. Типичная рецептура, оценка.",
+   "ingredients": [
+    {
+     "key": "lamb_shoulder_braised",
+     "grams": 107,
+     "role": "Main"
+    },
+    {
+     "key": "lamb_fat_cooked",
+     "grams": 8,
+     "role": "Fat"
+    },
+    {
+     "key": "potato_boiled",
+     "grams": 134,
+     "role": "Main"
+    },
+    {
+     "key": "carrot_cooked",
+     "grams": 67,
+     "role": "Main"
+    },
+    {
+     "key": "onion_cooked",
+     "grams": 40,
+     "role": "Main"
+    },
+    {
+     "key": "tomato_cooked",
+     "grams": 40,
+     "role": "Main"
+    },
+    {
+     "key": "bell_pepper_cooked",
+     "grams": 27,
+     "role": "Main"
+    },
+    {
+     "key": "chickpeas_cooked",
+     "grams": 40,
+     "role": "Main"
+    },
+    {
+     "key": "soup_stock_beef",
+     "grams": 533,
+     "role": "Main"
+    },
+    {
+     "key": "cilantro_fresh",
+     "grams": 4,
+     "role": "Garnish"
+    }
+   ]
+  },
+  {
+   "key": "norin",
+   "dishKey": "norin",
+   "nameRu": "Норин",
+   "nameUz": "Norin",
+   "nameEn": "Norin",
+   "aliases": [
+    "норин",
+    "нарын",
+    "norin",
+    "naryn"
+   ],
+   "category": "TraditionalFood",
+   "portionGrams": 250,
+   "yieldGrams": null,
+   "description": "Холодное блюдо из тонко нарезанной отварной лапши и мяса (конина, говядина) с луком и бульоном; вариант без казы. Типичная рецептура, оценка.",
+   "ingredients": [
+    {
+     "key": "noodles_egg_cooked",
+     "grams": 498,
+     "role": "Main"
+    },
+    {
+     "key": "horse_meat_roasted",
+     "grams": 200,
+     "role": "Main"
+    },
+    {
+     "key": "beef_brisket_braised",
+     "grams": 150,
+     "role": "Main"
+    },
+    {
+     "key": "lamb_fat_cooked",
+     "grams": 20,
+     "role": "Fat"
+    },
+    {
+     "key": "onion_raw",
+     "grams": 100,
+     "role": "Garnish"
+    },
+    {
+     "key": "soup_stock_beef",
+     "grams": 30,
+     "role": "Sauce"
+    },
+    {
+     "key": "black_pepper",
+     "grams": 2,
+     "role": "Garnish"
+    }
+   ]
+  },
+  {
+   "key": "mastava",
+   "dishKey": "mastava",
+   "nameRu": "Мастава",
+   "nameUz": "Mastava",
+   "nameEn": "Mastava",
+   "aliases": [
+    "мастава",
+    "mastava",
+    "рисовый суп"
+   ],
+   "category": "TraditionalFood",
+   "portionGrams": 400,
+   "yieldGrams": null,
+   "description": "Рисовый суп с мясом, картофелем и овощами, подаётся с катыком и зеленью. Типичная рецептура, оценка.",
+   "ingredients": [
+    {
+     "key": "beef_chuck_braised",
+     "grams": 87,
+     "role": "Main"
+    },
+    {
+     "key": "rice_white_cooked",
+     "grams": 87,
+     "role": "Main"
+    },
+    {
+     "key": "potato_boiled",
+     "grams": 87,
+     "role": "Main"
+    },
+    {
+     "key": "carrot_cooked",
+     "grams": 58,
+     "role": "Main"
+    },
+    {
+     "key": "onion_cooked",
+     "grams": 44,
+     "role": "Main"
+    },
+    {
+     "key": "tomato_cooked",
+     "grams": 44,
+     "role": "Main"
+    },
+    {
+     "key": "bell_pepper_cooked",
+     "grams": 23,
+     "role": "Main"
+    },
+    {
+     "key": "oil_cottonseed",
+     "grams": 15,
+     "role": "Fat"
+    },
+    {
+     "key": "soup_stock_beef",
+     "grams": 523,
+     "role": "Main"
+    },
+    {
+     "key": "yogurt_plain_whole",
+     "grams": 29,
+     "role": "Sauce"
+    },
+    {
+     "key": "dill_fresh",
+     "grams": 3,
+     "role": "Garnish"
+    }
+   ]
+  },
+  {
+   "key": "dimlama",
+   "dishKey": "dimlama",
+   "nameRu": "Димлама",
+   "nameUz": "Dimlama",
+   "nameEn": "Dimlama",
+   "aliases": [
+    "димлама",
+    "думлама",
+    "dimlama",
+    "dimlama sabzavotli"
+   ],
+   "category": "TraditionalFood",
+   "portionGrams": 400,
+   "yieldGrams": null,
+   "description": "Баранина, томлённая слоями с картофелем, капустой, морковью, луком, помидорами, перцем и баклажанами почти без воды. Типичная рецептура, оценка.",
+   "ingredients": [
+    {
+     "key": "lamb_shoulder_braised",
+     "grams": 171,
+     "role": "Main"
+    },
+    {
+     "key": "lamb_fat_cooked",
+     "grams": 14,
+     "role": "Fat"
+    },
+    {
+     "key": "potato_boiled",
+     "grams": 200,
+     "role": "Main"
+    },
+    {
+     "key": "cabbage_cooked",
+     "grams": 171,
+     "role": "Main"
+    },
+    {
+     "key": "carrot_cooked",
+     "grams": 114,
+     "role": "Main"
+    },
+    {
+     "key": "onion_cooked",
+     "grams": 86,
+     "role": "Main"
+    },
+    {
+     "key": "tomato_cooked",
+     "grams": 86,
+     "role": "Main"
+    },
+    {
+     "key": "bell_pepper_cooked",
+     "grams": 57,
+     "role": "Main"
+    },
+    {
+     "key": "eggplant_cooked",
+     "grams": 86,
+     "role": "Main"
+    },
+    {
+     "key": "garlic_raw",
+     "grams": 9,
+     "role": "Garnish"
+    },
+    {
+     "key": "dill_fresh",
+     "grams": 6,
+     "role": "Garnish"
+    }
+   ]
+  },
+  {
+   "key": "chuchvara",
+   "dishKey": "chuchvara",
+   "nameRu": "Чучвара с бульоном",
+   "nameUz": "Chuchvara",
+   "nameEn": "Chuchvara in broth",
+   "aliases": [
+    "чучвара",
+    "чучпара",
+    "chuchvara",
+    "пельмени"
+   ],
+   "category": "TraditionalFood",
+   "portionGrams": 350,
+   "yieldGrams": null,
+   "description": "Маленькие пельмени с мясным фаршем и луком, отваренные и поданные с бульоном и сметаной. Типичная рецептура, оценка.",
+   "ingredients": [
+    {
+     "key": "dumpling_dough",
+     "grams": 260,
+     "role": "Main"
+    },
+    {
+     "key": "beef_ground_80_cooked",
+     "grams": 195,
+     "role": "Main"
+    },
+    {
+     "key": "lamb_fat_cooked",
+     "grams": 19,
+     "role": "Fat"
+    },
+    {
+     "key": "onion_cooked",
+     "grams": 97,
+     "role": "Main"
+    },
+    {
+     "key": "soup_stock_beef",
+     "grams": 390,
+     "role": "Main"
+    },
+    {
+     "key": "sour_cream",
+     "grams": 39,
+     "role": "Sauce"
+    }
+   ]
+  },
+  {
+   "key": "khanum_meat",
+   "dishKey": "khanum",
+   "nameRu": "Ханум с мясом",
+   "nameUz": "Go‘shtli hanum",
+   "nameEn": "Khanum with meat",
+   "aliases": [
+    "ханум",
+    "хонум",
+    "hanum",
+    "xonim",
+    "khanum"
+   ],
+   "category": "TraditionalFood",
+   "portionGrams": 250,
+   "yieldGrams": null,
+   "description": "Рулет из тонкого теста с начинкой из рубленого мяса, курдючного жира и лука, приготовленный на пару. Типичная рецептура, оценка.",
+   "ingredients": [
+    {
+     "key": "dumpling_dough",
+     "grams": 411,
+     "role": "Main"
+    },
+    {
+     "key": "lamb_ground_cooked",
+     "grams": 274,
+     "role": "Main"
+    },
+    {
+     "key": "lamb_fat_cooked",
+     "grams": 41,
+     "role": "Fat"
+    },
+    {
+     "key": "onion_cooked",
+     "grams": 274,
+     "role": "Main"
+    }
+   ]
+  },
+  {
+   "key": "khanum_potato",
+   "dishKey": "khanum",
+   "nameRu": "Ханум с картофелем",
+   "nameUz": "Kartoshkali hanum",
+   "nameEn": "Khanum with potato",
+   "aliases": [
+    "ханум",
+    "ханум с картошкой",
+    "hanum",
+    "khanum"
+   ],
+   "category": "TraditionalFood",
+   "portionGrams": 250,
+   "yieldGrams": null,
+   "description": "Паровой рулет из теста с картофелем, луком и маслом. Типичная рецептура, оценка.",
+   "ingredients": [
+    {
+     "key": "dumpling_dough",
+     "grams": 408,
+     "role": "Main"
+    },
+    {
+     "key": "potato_boiled",
+     "grams": 408,
+     "role": "Main"
+    },
+    {
+     "key": "onion_cooked",
+     "grams": 136,
+     "role": "Main"
+    },
+    {
+     "key": "oil_cottonseed",
+     "grams": 34,
+     "role": "Fat"
+    },
+    {
+     "key": "butter",
+     "grams": 14,
+     "role": "Fat"
+    }
+   ]
+  },
+  {
+   "key": "gumma_meat",
+   "dishKey": "gumma",
+   "nameRu": "Гумма с мясом",
+   "nameUz": "Go‘shtli gumma",
+   "nameEn": "Gumma with meat",
+   "aliases": [
+    "гумма",
+    "пирожок",
+    "беляш",
+    "gumma",
+    "go‘shtli gumma"
+   ],
+   "category": "TraditionalFood",
+   "portionGrams": 120,
+   "yieldGrams": null,
+   "description": "Жаренный во фритюре пирожок из дрожжевого теста с мясным фаршем и луком. Типичная рецептура, оценка.",
+   "ingredients": [
+    {
+     "key": "bread_white",
+     "grams": 520,
+     "role": "Main"
+    },
+    {
+     "key": "oil_cottonseed",
+     "grams": 80,
+     "role": "Fat"
+    },
+    {
+     "key": "beef_ground_80_cooked",
+     "grams": 260,
+     "role": "Main"
+    },
+    {
+     "key": "onion_cooked",
+     "grams": 140,
+     "role": "Main"
+    }
+   ]
+  },
+  {
+   "key": "gumma_potato",
+   "dishKey": "gumma",
+   "nameRu": "Гумма с картофелем",
+   "nameUz": "Kartoshkali gumma",
+   "nameEn": "Gumma with potato",
+   "aliases": [
+    "гумма",
+    "пирожок с картошкой",
+    "gumma",
+    "kartoshkali gumma"
+   ],
+   "category": "TraditionalFood",
+   "portionGrams": 120,
+   "yieldGrams": null,
+   "description": "Жаренный во фритюре пирожок с картофельной начинкой и луком. Типичная рецептура, оценка.",
+   "ingredients": [
+    {
+     "key": "bread_white",
+     "grams": 530,
+     "role": "Main"
+    },
+    {
+     "key": "oil_cottonseed",
+     "grams": 82,
+     "role": "Fat"
+    },
+    {
+     "key": "potato_boiled",
+     "grams": 306,
+     "role": "Main"
+    },
+    {
+     "key": "onion_cooked",
+     "grams": 82,
+     "role": "Main"
+    }
+   ]
+  },
+  {
+   "key": "non_obi",
+   "dishKey": "non",
+   "nameRu": "Лепёшка (оби нон)",
+   "nameUz": "Obi non",
+   "nameEn": "Uzbek flatbread (obi non)",
+   "aliases": [
+    "лепёшка",
+    "лепешка",
+    "нон",
+    "non",
+    "obi non",
+    "оби нон",
+    "тандыр нон"
+   ],
+   "category": "TraditionalFood",
+   "portionGrams": 100,
+   "yieldGrams": null,
+   "description": "Тандырная лепёшка из дрожжевого пшеничного теста. Пищевая ценность взята по ближайшему аналогу (пшеничная пита USDA).",
+   "ingredients": [
+    {
+     "key": "flatbread_wheat",
+     "grams": 1000,
+     "role": "Main"
+    }
+   ]
+  },
+  {
+   "key": "suzma",
+   "dishKey": "suzma",
+   "nameRu": "Сузьма",
+   "nameUz": "Suzma",
+   "nameEn": "Suzma (strained yogurt)",
+   "aliases": [
+    "сузьма",
+    "сюзьма",
+    "suzma",
+    "сузма"
+   ],
+   "category": "TraditionalFood",
+   "portionGrams": 100,
+   "yieldGrams": null,
+   "description": "Откинутый катык (процеженный кисломолочный продукт). Пищевая ценность по ближайшему аналогу — греческий йогурт из цельного молока (USDA).",
+   "ingredients": [
+    {
+     "key": "yogurt_greek_whole",
+     "grams": 1000,
+     "role": "Main"
+    }
+   ]
+  },
+  {
+   "key": "katlama",
+   "dishKey": "katlama",
+   "nameRu": "Катлама",
+   "nameUz": "Qatlama",
+   "nameEn": "Katlama (layered flatbread)",
+   "aliases": [
+    "катлама",
+    "qatlama",
+    "слоёная лепёшка",
+    "katlama"
+   ],
+   "category": "TraditionalFood",
+   "portionGrams": 150,
+   "yieldGrams": null,
+   "description": "Слоёная лепёшка из пресного теста, промазанного сливочным маслом, обжаренная на масле. Типичная рецептура, оценка.",
+   "ingredients": [
+    {
+     "key": "flatbread_wheat",
+     "grams": 750,
+     "role": "Main"
+    },
+    {
+     "key": "butter",
+     "grams": 188,
+     "role": "Fat"
+    },
+    {
+     "key": "oil_cottonseed",
+     "grams": 62,
+     "role": "Fat"
+    }
+   ]
+  },
+  {
+   "key": "chakchak",
+   "dishKey": "chakchak",
+   "nameRu": "Чак-чак",
+   "nameUz": "Chak-chak",
+   "nameEn": "Chak-chak",
+   "aliases": [
+    "чак-чак",
+    "чакчак",
+    "chak-chak",
+    "chakchak"
+   ],
+   "category": "TraditionalFood",
+   "portionGrams": 100,
+   "yieldGrams": null,
+   "description": "Кусочки яичного теста, обжаренные во фритюре и пропитанные медово-сахарным сиропом. Типичная рецептура, оценка.",
+   "ingredients": [
+    {
+     "key": "noodles_fried_crispy",
+     "grams": 625,
+     "role": "Main"
+    },
+    {
+     "key": "honey",
+     "grams": 250,
+     "role": "Sauce"
+    },
+    {
+     "key": "sugar",
+     "grams": 125,
+     "role": "Sauce"
+    }
+   ]
+  },
+  {
+   "key": "achichuk",
+   "dishKey": "achichuk",
+   "nameRu": "Салат аччик-чучук",
+   "nameUz": "Achchiq-chuchuk",
+   "nameEn": "Achichuk salad",
+   "aliases": [
+    "аччик-чучук",
+    "ачичук",
+    "achchiq-chuchuk",
+    "achichuk",
+    "салат из помидоров и лука"
+   ],
+   "category": "TraditionalFood",
+   "portionGrams": 150,
+   "yieldGrams": null,
+   "description": "Салат из тонко нарезанных помидоров и лука с острым перцем и зеленью, традиционно подаётся к плову. Типичная рецептура, оценка.",
+   "ingredients": [
+    {
+     "key": "tomato_raw",
+     "grams": 650,
+     "role": "Main"
+    },
+    {
+     "key": "onion_raw",
+     "grams": 300,
+     "role": "Main"
+    },
+    {
+     "key": "cucumber_raw",
+     "grams": 30,
+     "role": "Main"
+    },
+    {
+     "key": "cilantro_fresh",
+     "grams": 10,
+     "role": "Garnish"
+    },
+    {
+     "key": "chili_pepper_raw",
+     "grams": 10,
+     "role": "Garnish"
+    }
+   ]
+  }
+ ]
+}

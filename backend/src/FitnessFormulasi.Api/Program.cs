@@ -6,7 +6,12 @@ using FitnessFormulasi.Api.Common;
 using FitnessFormulasi.Api.Data;
 using FitnessFormulasi.Api.Domain;
 using FitnessFormulasi.Api.Features;
+using FitnessFormulasi.Api.Features.Access;
+using FitnessFormulasi.Api.Features.Legal;
+using FitnessFormulasi.Api.Features.Banners;
 using FitnessFormulasi.Api.Features.Integrations;
+using FitnessFormulasi.Api.Features.Ai;
+using FitnessFormulasi.Api.Features.Nutrition;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -25,7 +30,11 @@ builder.Services.Configure<ClubOptions>(config.GetSection(ClubOptions.Section));
 var connectionString = config.GetConnectionString("Default");
 if (string.IsNullOrWhiteSpace(connectionString))
     throw new InvalidOperationException("ConnectionStrings:Default is not configured.");
-builder.Services.AddDbContext<AppDbContext>(o => o.UseNpgsql(connectionString));
+// The interceptor wakes the turnstile synchronisation after changes to memberships, visits and face photos.
+builder.Services.AddSingleton<AccessSyncSignal>();
+builder.Services.AddSingleton<AccessChangeInterceptor>();
+builder.Services.AddDbContext<AppDbContext>((sp, o) => o.UseNpgsql(connectionString)
+    .AddInterceptors(sp.GetRequiredService<AccessChangeInterceptor>()));
 
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddSingleton<IClubClock, ClubClock>();
@@ -37,11 +46,65 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<Profiles>();
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<MembershipService>();
+builder.Services.AddScoped<AccountDeletionService>();
+builder.Services.AddScoped<MembershipRequestService>();
+builder.Services.AddSingleton<PassTokenService>();
+builder.Services.AddScoped<CheckInService>();
 builder.Services.AddScoped<TrainerRequestService>();
 builder.Services.AddScoped<TrainingSessionService>();
 builder.Services.Configure<IntegrationsOptions>(config.GetSection(IntegrationsOptions.Section));
 builder.Services.AddSingleton<SecretProtector>();
 builder.Services.AddScoped<IntegrationSettingsService>();
+builder.Services.Configure<MediaOptions>(config.GetSection(MediaOptions.Section));
+builder.Services.AddSingleton<MediaStorage>();
+
+// Face recognition terminals (Hikvision ISAPI): face photos, synchronisation with memberships, pass events.
+builder.Services.Configure<AccessOptions>(config.GetSection(AccessOptions.Section));
+builder.Services.Configure<LegalOptions>(config.GetSection(LegalOptions.Section));
+builder.Services.AddSingleton<AccessSyncLock>();
+builder.Services.AddSingleton<IIsapiHandlerFactory, IsapiHandlerFactory>();
+builder.Services.AddSingleton<HikvisionTerminalFactory>();
+builder.Services.AddScoped<AccessPlanner>();
+builder.Services.AddScoped<AccessSyncService>();
+builder.Services.AddScoped<FaceService>();
+builder.Services.AddHostedService<AccessSyncWorker>();
+
+// AI Food Scanner, food diary, nutrition analytics and consultant (Features/Nutrition, Features/Ai).
+// The AI provider is chosen by configuration (Ai__Provider, Ai__ApiKey); without it every AI call answers ai_not_configured.
+builder.Services.Configure<AiOptions>(config.GetSection(AiOptions.Section));
+var aiOptions = config.GetSection(AiOptions.Section).Get<AiOptions>() ?? new AiOptions();
+if (string.Equals(aiOptions.Provider, "Anthropic", StringComparison.OrdinalIgnoreCase) && aiOptions.IsEnabled)
+    builder.Services.AddSingleton<IAiModelClient, AnthropicAiClient>();
+else if (string.Equals(aiOptions.Provider, "None", StringComparison.OrdinalIgnoreCase) || !aiOptions.IsEnabled)
+    builder.Services.AddSingleton<IAiModelClient, DisabledAiClient>();
+else
+    throw new InvalidOperationException($"Ai:Provider '{aiOptions.Provider}' is not supported. Use Anthropic or None.");
+builder.Services.AddScoped<AiGateway>();
+builder.Services.AddMemoryCache();
+builder.Services.Configure<FoodDataOptions>(config.GetSection(FoodDataOptions.Section));
+var foodData = config.GetSection(FoodDataOptions.Section).Get<FoodDataOptions>() ?? new FoodDataOptions();
+builder.Services.AddHttpClient<IBarcodeProductSource, OpenFoodFactsSource>(c =>
+{
+    c.BaseAddress = new Uri(foodData.OpenFoodFactsBaseUrl);
+    c.Timeout = TimeSpan.FromSeconds(foodData.TimeoutSeconds);
+    c.DefaultRequestHeaders.UserAgent.ParseAdd(foodData.UserAgent);
+});
+builder.Services.AddHttpClient<IFoodSearchSource, UsdaFoodSearchSource>(c =>
+{
+    c.BaseAddress = new Uri(foodData.UsdaBaseUrl);
+    c.Timeout = TimeSpan.FromSeconds(foodData.TimeoutSeconds);
+});
+builder.Services.AddSingleton<FoodCatalog>();
+builder.Services.AddScoped<FoodDatabaseService>();
+builder.Services.AddScoped<FoodRecognitionService>();
+builder.Services.AddScoped<NutritionProfileService>();
+builder.Services.AddScoped<NutritionSummaryService>();
+builder.Services.AddScoped<FoodScannerService>();
+builder.Services.AddScoped<FoodDiaryService>();
+builder.Services.AddScoped<NutritionAnalyticsService>();
+builder.Services.AddScoped<NutritionDataTools>();
+builder.Services.AddScoped<NutritionConsultantService>();
+builder.Services.AddScoped<NutritionReportService>();
 
 // SMS: the logging sender exists only in Development. Production answers 503 until a real provider is connected.
 if (builder.Environment.IsDevelopment())
@@ -101,6 +164,21 @@ builder.Services.AddRateLimiter(o =>
         _ => new FixedWindowRateLimiterOptions
         {
             PermitLimit = config.GetValue("RateLimiting:AuthPermitPerMinute", 20),
+            Window = TimeSpan.FromMinutes(1),
+        }));
+    // AI requests cost money: a few per minute per user (daily limits are in AiGateway). Lookups: barcodes and search.
+    o.AddPolicy(RateLimits.Ai, http => RateLimitPartition.GetFixedWindowLimiter(
+        http.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? http.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+        _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = config.GetValue("RateLimiting:AiPermitPerMinute", 6),
+            Window = TimeSpan.FromMinutes(1),
+        }));
+    o.AddPolicy(RateLimits.Lookup, http => RateLimitPartition.GetFixedWindowLimiter(
+        http.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? http.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+        _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = config.GetValue("RateLimiting:LookupPermitPerMinute", 60),
             Window = TimeSpan.FromMinutes(1),
         }));
 });

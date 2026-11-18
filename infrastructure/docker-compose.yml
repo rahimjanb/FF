@@ -37,8 +37,20 @@ services:
       Bootstrap__AdminPhone: ${BOOTSTRAP_ADMIN_PHONE:-}
       Bootstrap__AdminPassword: ${BOOTSTRAP_ADMIN_PASSWORD:-}
       Cors__AllowedOrigins__0: ${ADMIN_ORIGIN:-http://localhost:5173}
+      # Banner photos and videos uploaded in the admin panel, and clients' food photos; back up together with the database.
+      Media__RootPath: /data/media
+      # AI Food Scanner (docs/NUTRITION.md). Without AI_API_KEY photo analysis is off; the diary and barcodes still work.
+      Ai__Provider: ${AI_PROVIDER:-None}
+      Ai__ApiKey: ${AI_API_KEY:-}
+      Ai__VisionModel: ${AI_VISION_MODEL:-claude-opus-5-5}
+      Ai__ChatModel: ${AI_CHAT_MODEL:-claude-opus-5-5}
+      Ai__MonthlyBudgetUsd: ${AI_MONTHLY_BUDGET_USD:-100}
+      FoodData__UsdaApiKey: ${USDA_API_KEY:-}
+    volumes:
+      - media-data:/data/media
     ports:
       - "127.0.0.1:${API_PORT:-8080}:8080"
 
 volumes:
   postgres-data:
+  media-data:

@@ -90,5 +90,17 @@ String notificationText(AppLocalizations t, AppNotification n) => switch (n.type
   NotificationType.trainingSessionScheduled => t.notifTrainingSessionScheduled,
   NotificationType.trainingSessionCancelled => t.notifTrainingSessionCancelled,
   NotificationType.membershipAssigned => t.notifMembershipAssigned(n.payload ?? ''),
+  NotificationType.membershipFrozen => t.notifMembershipFrozen(
+    _isoDate((n.payload ?? '').split('/').first),
+    _isoDate((n.payload ?? '').split('/').last),
+  ),
+  NotificationType.membershipUnfrozen => t.notifMembershipUnfrozen(_isoDate(n.payload ?? '')),
+  NotificationType.membershipRequestRejected => t.notifMembershipRequestRejected(n.payload ?? ''),
   NotificationType.unknown => '',
 };
+
+/// Payload dates come as yyyy-MM-dd; shown as dd.MM.yyyy like everywhere in the app.
+String _isoDate(String v) {
+  final p = v.split('-');
+  return p.length == 3 ? '${p[2]}.${p[1]}.${p[0]}' : v;
+}

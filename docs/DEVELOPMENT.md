@@ -27,6 +27,10 @@ dotnet user-secrets set "Jwt:SigningKey" "$(openssl rand -base64 48)"
 dotnet user-secrets set "Bootstrap:AdminPhone" "+998XXXXXXXXX"
 dotnet user-secrets set "Bootstrap:AdminPassword" "<надёжный пароль>"
 
+# Необязательно: ИИ-анализ фото еды (docs/NUTRITION.md)
+dotnet user-secrets set "Ai:Provider" "Anthropic"
+dotnet user-secrets set "Ai:ApiKey" "<ключ console.anthropic.com>"
+
 ASPNETCORE_ENVIRONMENT=Development dotnet run --launch-profile http
 ```
 
@@ -46,6 +50,13 @@ ASPNETCORE_ENVIRONMENT=Development dotnet run --launch-profile http
 | `Cors__AllowedOrigins__0` | Адрес веб-панели, если она на другом домене |
 | `Database__MigrateOnStartup` | `true`, чтобы применять миграции при старте |
 | `Bootstrap__AdminPhone`, `Bootstrap__AdminPassword` | Первый администратор (однократно) |
+| `Media__RootPath` | Папка для фото и видео баннеров. По умолчанию `App_Data/media` рядом с API (в git не попадает); в compose — volume `media-data` |
+| `Integrations__EncryptionKey` | Ключ шифрования секретов интеграций и паролей терминалов (`openssl rand -base64 32`). Без него терминал не добавить |
+| `Access__BackgroundSync` | `false` отключает фоновую синхронизацию терминалов (по умолчанию `true`; в тестах выключена) |
+| `Access__SyncIntervalSeconds` | Как часто синхронизировать терминалы без изменений, по умолчанию 60 секунд (не меньше 10) |
+| `Ai__Provider`, `Ai__ApiKey` | ИИ для раздела «Питание»: `Anthropic` и ключ API (секрет). Без них фото не анализируются, дневник и штрихкоды работают. Остальные `Ai__*` и `FoodData__*` — в [NUTRITION.md](NUTRITION.md) |
+| `FoodData__UsdaApiKey` | Необязательно: поиск в USDA FoodData Central вне встроенной базы продуктов |
+| `Legal__OperatorName`, `Legal__Address`, `Legal__Phone`, `Legal__Email`, `Legal__Telegram`, `Legal__UpdatedOn` | Реквизиты клуба на страницах `/legal/privacy` и `/legal/delete-account`; на них ссылаются магазины приложений. Пустое значение показывается как «—» ([STORE.md](STORE.md), раздел 3.2). `Legal__AiProcessor` — ИИ-сервис в политике |
 
 API в контейнере: `docker compose -f infrastructure/docker-compose.yml --profile api up -d --build`
 (порт `127.0.0.1:8080`, переменные берутся из `infrastructure/.env`).

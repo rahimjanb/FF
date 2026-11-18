@@ -4,19 +4,32 @@ import 'package:provider/provider.dart';
 
 import '../../core/config.dart';
 import '../../data/models.dart';
+import '../../data/nutrition_models.dart';
+import '../../data/nutrition_repository.dart';
 import '../../data/repositories.dart';
 import '../../l10n/gen/app_localizations.dart';
 import '../formatters.dart';
 import '../theme.dart';
 import '../widgets/common.dart';
 import '../widgets/glass.dart';
+import 'banners.dart';
+import 'face_access_screen.dart';
+import 'nutrition/nutrition_hub_screen.dart';
+import 'qr_pass_sheet.dart';
 import '../widgets/membership_view.dart';
 import 'notifications_screen.dart';
 
 class _HomeData {
-  _HomeData(this.dashboard, this.visitTimes);
+  _HomeData(this.dashboard, this.visitTimes, this.banners, this.face, this.nutrition);
   final ClientDashboard dashboard;
   final List<DateTime> visitTimes;
+  final List<PromoBanner> banners;
+
+  /// Entry by face; null when it could not be loaded.
+  final FaceAccess? face;
+
+  /// Today's calories; null when they could not be loaded (the card still opens the scanner).
+  final NutritionDaily? nutrition;
 }
 
 /// Client home in the Liquid Glass style. Tabs: 1 membership, 2 trainers, 3 workouts.
@@ -27,9 +40,22 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final repo = context.read<ClientRepository>();
+    final nutritionRepo = context.read<NutritionRepository>();
     Future<_HomeData> load() async {
-      final r = await Future.wait<Object>([repo.dashboard(), repo.recentVisitTimes()]);
-      return _HomeData(r[0] as ClientDashboard, r[1] as List<DateTime>);
+      // Banners are advertising: if they fail to load, Home still shows everything else.
+      final banners = repo.banners().then<List<PromoBanner>>((b) => b, onError: (Object _) => <PromoBanner>[]);
+      // Likewise the face entry state: without it Home just does not offer to add a photo.
+      final face = repo.faceAccess().then<FaceAccess?>((f) => f, onError: (Object _) => null);
+      // And today's calories: the nutrition card opens the scanner either way.
+      final nutrition = nutritionRepo.daily().then<NutritionDaily?>((d) => d, onError: (Object _) => null);
+      final r = await Future.wait<Object?>([repo.dashboard(), repo.recentVisitTimes(), banners, face, nutrition]);
+      return _HomeData(
+        r[0] as ClientDashboard,
+        r[1] as List<DateTime>,
+        r[2] as List<PromoBanner>,
+        r[3] as FaceAccess?,
+        r[4] as NutritionDaily?,
+      );
     }
 
     return GlassBackground(
@@ -108,8 +134,28 @@ class _HomeContent extends StatelessWidget {
             height: 1.15,
           ),
         ),
+        if (data.banners.isNotEmpty) ...[const SizedBox(height: 18), BannerCarousel(banners: data.banners)],
+        // A client with a membership but no face photo is invited to enter by face.
+        if (data.face?.status == FaceAccessStatus.none && (d.currentMembership ?? d.nextMembership) != null) ...[
+          const SizedBox(height: 18),
+          FaceHomePrompt(
+            onTap: () async {
+              await openFaceAccess(context);
+              await reload();
+            },
+          ),
+        ],
         const SizedBox(height: Brand.sectionGap),
         _MembershipCard(membership: d.currentMembership ?? d.nextMembership, onOpen: () => onNavigate(1)),
+        const SizedBox(height: Brand.sectionGap),
+        GlassSectionHeader(t.nutritionTitle),
+        NutritionHomeCard(
+          daily: data.nutrition,
+          onOpen: () async {
+            await openNutritionHub(context);
+            await reload();
+          },
+        ),
         const SizedBox(height: Brand.sectionGap),
         GlassSectionHeader(t.nextWorkout, action: t.schedule, onAction: () => onNavigate(3)),
         _NextWorkoutCard(dashboard: d, fmt: fmt, onNavigate: onNavigate),
@@ -209,8 +255,12 @@ class _MembershipCard extends StatelessWidget {
                 child: GradientPillButton(label: t.myMembership, icon: Icons.north_east_rounded, onPressed: onOpen),
               ),
               const SizedBox(width: 10),
-              // QR entry needs the turnstile integration (stage 2); shown disabled until then.
-              GlassPillButton(label: t.qrEntry, icon: Icons.qr_code_2_rounded, badge: t.soon),
+              GlassPillButton(
+                key: const Key('home-qr-pass'),
+                label: t.qrEntry,
+                icon: Icons.qr_code_2_rounded,
+                onPressed: () => showQrPass(context, membership: m),
+              ),
             ],
           ),
         ],
@@ -267,10 +317,13 @@ class _NextWorkoutCard extends StatelessWidget {
     final t = AppLocalizations.of(context);
     final s = dashboard.nextSession;
     final noTrainer = dashboard.trainer == null;
-    final title = s == null ? t.noWorkoutsYet : '${_day(t, s.startsAt)}, ${fmt.time(s.startsAt)}';
+    final solo = noTrainer && dashboard.withoutTrainer;
+    final title = s == null
+        ? (solo ? t.withoutTrainerHome : t.noWorkoutsYet)
+        : '${_day(t, s.startsAt)}, ${fmt.time(s.startsAt)}';
     final subtitle = s != null
         ? t.withTrainerShort(s.trainer.fullName)
-        : (noTrainer ? t.chooseTrainerForWorkoutsHint : t.workoutsByTrainerHint);
+        : (solo ? t.soloNextWorkoutHint : (noTrainer ? t.chooseTrainerForWorkoutsHint : t.workoutsByTrainerHint));
     return GlassCard(
       onTap: () => onNavigate(3),
       child: Row(
@@ -292,12 +345,21 @@ class _NextWorkoutCard extends StatelessWidget {
           ),
           if (s == null) ...[
             const SizedBox(width: 10),
-            // Without a trainer the next step is choosing one; with a trainer it is the schedule.
-            _RoundGradientButton(
-              icon: noTrainer ? Icons.add_rounded : Icons.chevron_right_rounded,
-              tooltip: noTrainer ? t.chooseTrainer : t.schedule,
-              onTap: () => onNavigate(noTrainer ? 2 : 3),
-            ),
+            // Training alone starts with the QR pass at the desk; without a trainer the next step is choosing one;
+            // with a trainer it is the schedule.
+            if (solo)
+              _RoundGradientButton(
+                key: const Key('home-solo-qr'),
+                icon: Icons.qr_code_2_rounded,
+                tooltip: t.startWorkout,
+                onTap: () => showQrPass(context, membership: dashboard.currentMembership ?? dashboard.nextMembership),
+              )
+            else
+              _RoundGradientButton(
+                icon: noTrainer ? Icons.add_rounded : Icons.chevron_right_rounded,
+                tooltip: noTrainer ? t.chooseTrainer : t.schedule,
+                onTap: () => onNavigate(noTrainer ? 2 : 3),
+              ),
           ],
         ],
       ),
@@ -307,7 +369,7 @@ class _NextWorkoutCard extends StatelessWidget {
 
 /// 36×36 gradient circle inside a 44×44 touch target.
 class _RoundGradientButton extends StatelessWidget {
-  const _RoundGradientButton({required this.icon, required this.onTap, required this.tooltip});
+  const _RoundGradientButton({super.key, required this.icon, required this.onTap, required this.tooltip});
   final IconData icon;
   final VoidCallback onTap;
   final String tooltip;
@@ -349,10 +411,13 @@ class _TrainerCard extends StatelessWidget {
     final t = AppLocalizations.of(context);
     final trainer = dashboard.trainer;
     final pending = dashboard.pendingTrainerRequest;
+    final solo = trainer == null && pending == null && dashboard.withoutTrainer;
     // With an assigned trainer only their specialization is shown; a pending request matters only without one.
     final String? subtitle = trainer != null
         ? trainer.specialization
-        : (pending != null ? t.pendingRequestTo(pending.trainer.fullName) : t.findYourTrainer);
+        : (pending != null
+              ? t.pendingRequestTo(pending.trainer.fullName)
+              : (solo ? t.withoutTrainerHome : t.findYourTrainer));
     return GlassCard(
       onTap: onTap,
       child: Row(
@@ -377,7 +442,7 @@ class _TrainerCard extends StatelessWidget {
             ),
             alignment: Alignment.center,
             child: trainer == null
-                ? const Icon(Icons.person_search_rounded, color: Colors.white, size: 24)
+                ? Icon(solo ? Icons.directions_run_rounded : Icons.person_search_rounded, color: Colors.white, size: 24)
                 : trainer.photoUrl != null
                 ? null
                 : Text(
@@ -391,7 +456,7 @@ class _TrainerCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  trainer?.fullName ?? t.noTrainer,
+                  trainer?.fullName ?? (solo ? t.withoutTrainerTitle : t.noTrainer),
                   style: const TextStyle(color: Brand.textPrimary, fontSize: 17, fontWeight: FontWeight.w600),
                 ),
                 if (subtitle != null) const SizedBox(height: 3),

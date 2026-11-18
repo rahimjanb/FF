@@ -51,11 +51,11 @@ void main() {
     testWidgets('loads older pages on demand without duplicates', (tester) async {
       final b = backend(pagedRoute(history, shift: 2));
       await pumpScreen(tester, const WorkoutsScreen(), backend: b);
-      expect(find.byType(SessionTile), findsNWidgets(20));
+      expect(find.byType(WorkoutRow), findsNWidgets(20));
 
       await tapLoadMore(tester);
       // Page 2 overlaps page 1 by two rows (7 items returned); duplicates are skipped, so 25, not 27.
-      expect(find.byType(SessionTile), findsNWidgets(25));
+      expect(find.byType(WorkoutRow), findsNWidgets(25));
       final pages = b.requests
           .where((r) => r.url.queryParameters['scope'] == 'History')
           .map((r) => r.url.queryParameters['page'])
@@ -75,12 +75,12 @@ void main() {
       await pumpScreen(tester, const WorkoutsScreen(), backend: b);
 
       await tapLoadMore(tester);
-      expect(find.byType(SessionTile), findsNWidgets(20));
+      expect(find.byType(WorkoutRow), findsNWidgets(20));
       expect(find.text('Повторить'), findsOneWidget);
 
       fail = false;
       await tapLoadMore(tester);
-      expect(find.byType(SessionTile), findsNWidgets(25));
+      expect(find.byType(WorkoutRow), findsNWidgets(25));
       expect(find.byKey(const Key('load-more')), findsNothing);
     });
   });

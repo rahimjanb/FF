@@ -1,9 +1,11 @@
 import 'package:fitness_formulasi/app.dart';
 import 'package:fitness_formulasi/core/api_client.dart';
 import 'package:fitness_formulasi/core/token_storage.dart';
+import 'package:fitness_formulasi/data/nutrition_repository.dart';
 import 'package:fitness_formulasi/data/repositories.dart';
 import 'package:fitness_formulasi/state/locale_controller.dart';
 import 'package:fitness_formulasi/state/session.dart';
+import 'package:fitness_formulasi/ui/widgets/glass.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
@@ -24,6 +26,7 @@ Future<FakeBackend> pumpApp(WidgetTester tester, {String role = 'Client', bool m
         Provider.value(value: ClientRepository(api)),
         Provider.value(value: TrainerRepository(api)),
         Provider.value(value: NotificationRepository(api)),
+        Provider.value(value: NutritionRepository(api)),
       ],
       child: const FitnessApp(),
     ),
@@ -38,19 +41,23 @@ void main() {
     await pumpApp(tester);
     expect(find.text('С возвращением'), findsOneWidget);
 
-    await tester.enterText(find.byType(TextFormField).at(0), '123');
-    await tester.tap(find.widgetWithText(FilledButton, 'Войти'));
+    await tester.enterText(find.byKey(const Key('login-phone')), '123');
+    await tester.pump();
+    expect(tester.widget<GradientPillButton>(find.byKey(const Key('login-submit'))).onPressed, isNull);
+    await tester.enterText(find.byKey(const Key('login-password')), 'x');
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('login-submit')));
     await tester.pumpAndSettle();
     expect(find.text('Введите номер в формате +998 90 123 45 67'), findsOneWidget);
-    expect(find.text('Обязательное поле'), findsOneWidget);
   });
 
   testWidgets('wrong password shows a localized error', (tester) async {
     await pumpApp(tester);
-    await tester.enterText(find.byType(TextFormField).at(0), '+998901234567');
-    await tester.enterText(find.byType(TextFormField).at(1), 'Wrong1234');
+    await tester.enterText(find.byKey(const Key('login-phone')), '+998901234567');
+    await tester.enterText(find.byKey(const Key('login-password')), 'Wrong1234');
+    await tester.pump();
     await tester.runAsync(() async {
-      await tester.tap(find.widgetWithText(FilledButton, 'Войти'));
+      await tester.tap(find.byKey(const Key('login-submit')));
       await Future<void>.delayed(const Duration(milliseconds: 50));
     });
     await tester.pumpAndSettle();
@@ -59,10 +66,11 @@ void main() {
 
   testWidgets('client logs in and sees real dashboard data', (tester) async {
     await pumpApp(tester);
-    await tester.enterText(find.byType(TextFormField).at(0), '90 123 45 67');
-    await tester.enterText(find.byType(TextFormField).at(1), 'Secret123');
+    await tester.enterText(find.byKey(const Key('login-phone')), '90 123 45 67');
+    await tester.enterText(find.byKey(const Key('login-password')), 'Secret123');
+    await tester.pump();
     await tester.runAsync(() async {
-      await tester.tap(find.widgetWithText(FilledButton, 'Войти'));
+      await tester.tap(find.byKey(const Key('login-submit')));
       await Future<void>.delayed(const Duration(milliseconds: 100));
     });
     await tester.pumpAndSettle();
@@ -86,10 +94,11 @@ void main() {
 
   testWidgets('temporary password: forced change screen, then dashboard', (tester) async {
     final backend = await pumpApp(tester, mustChangePassword: true);
-    await tester.enterText(find.byType(TextFormField).at(0), '+998901234567');
-    await tester.enterText(find.byType(TextFormField).at(1), 'Secret123');
+    await tester.enterText(find.byKey(const Key('login-phone')), '+998901234567');
+    await tester.enterText(find.byKey(const Key('login-password')), 'Secret123');
+    await tester.pump();
     await tester.runAsync(() async {
-      await tester.tap(find.widgetWithText(FilledButton, 'Войти'));
+      await tester.tap(find.byKey(const Key('login-submit')));
       await Future<void>.delayed(const Duration(milliseconds: 100));
     });
     await tester.pumpAndSettle();

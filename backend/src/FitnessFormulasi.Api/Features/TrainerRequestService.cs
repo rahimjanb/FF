@@ -88,6 +88,7 @@ public sealed class TrainerRequestService(AppDbContext db, ICurrentUser currentU
         if (accept)
         {
             request.ClientProfile.AssignedTrainerId = request.TrainerProfileId;
+            request.ClientProfile.WithoutTrainer = false;
             // A client has one trainer: other pending requests of this client are closed automatically.
             var others = await db.TrainerRequests.Where(r => r.ClientProfileId == request.ClientProfileId && r.Id != request.Id
                                                              && r.Status == TrainerRequestStatus.Pending).ToListAsync(ct);

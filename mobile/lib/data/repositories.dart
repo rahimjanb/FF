@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import '../core/api_client.dart';
 import 'models.dart';
 
@@ -41,6 +43,13 @@ class AuthRepository {
     await _api.tokens.clear();
   }
 
+  /// Deletes the client's own account (personal data is erased on the server). The server has already ended every
+  /// session, so only the local tokens are cleared; no logout call is needed.
+  Future<void> deleteAccount(String password) async {
+    await _api.post('/api/me/delete-account', {'password': password});
+    await _api.tokens.clear();
+  }
+
   Future<AuthUser> _auth(Future<dynamic> call) async {
     final json = await call as Map<String, dynamic>;
     await _api.tokens.save(json['accessToken'] as String, json['refreshToken'] as String);
@@ -62,6 +71,57 @@ class ClientRepository {
   /// Plans currently on sale (read-only; purchase is at the club desk in stage 1).
   Future<List<MembershipPlan>> plans() async =>
       (await _api.get('/api/me/plans') as List).map((e) => MembershipPlan.fromJson(e as Map<String, dynamic>)).toList();
+
+  Future<QrPass> pass() async => QrPass.fromJson(await _api.get('/api/me/pass') as Map<String, dynamic>);
+
+  Future<List<MembershipRequest>> membershipRequests() async => (await _api.get('/api/me/membership-requests') as List)
+      .map((e) => MembershipRequest.fromJson(e as Map<String, dynamic>))
+      .toList();
+
+  /// Asks the club for [planId]; staff complete it after payment at the desk.
+  Future<MembershipRequest> requestMembership(String planId, MembershipRequestKind kind) async =>
+      MembershipRequest.fromJson(
+        await _api.post('/api/me/membership-requests', {'planId': planId, 'kind': kind.api}) as Map<String, dynamic>,
+      );
+
+  Future<void> cancelMembershipRequest(String id) => _api.post('/api/me/membership-requests/$id/cancel');
+
+  /// Freezes the client's own membership for the club-local days [from]..[to] (inclusive).
+  Future<Membership> freezeMembership(String id, DateTime from, DateTime to) async => Membership.fromJson(
+    await _api.post('/api/me/memberships/$id/freeze', {'startDate': _day(from), 'endDate': _day(to)})
+        as Map<String, dynamic>,
+  );
+
+  /// Ends the current freeze today or cancels a planned one.
+  Future<Membership> unfreezeMembership(String id) async =>
+      Membership.fromJson(await _api.post('/api/me/memberships/$id/unfreeze') as Map<String, dynamic>);
+
+  /// Banners shown at the top of the home screen.
+  Future<List<PromoBanner>> banners() async =>
+      (await _api.get('/api/banners') as List).map((e) => PromoBanner.fromJson(e as Map<String, dynamic>)).toList();
+
+  /// The client trains on their own; pending trainer requests are withdrawn.
+  Future<ClientProfile> trainWithoutTrainer() async =>
+      ClientProfile.fromJson(await _api.post('/api/me/without-trainer') as Map<String, dynamic>);
+
+  /// Entry by face through the turnstile: whether the photo is on the terminals and for which days.
+  Future<FaceAccess> faceAccess() async => FaceAccess.fromJson(await _api.get('/api/me/face') as Map<String, dynamic>);
+
+  /// The client's own face photo (JPEG).
+  Future<Uint8List> facePhoto() => _api.getBytes('/api/me/face/photo');
+
+  /// Uploads the face photo (JPEG up to 200 KB) with the client's consent to its processing for entry.
+  Future<FaceAccess> uploadFace(Uint8List jpeg) async => FaceAccess.fromJson(
+    await _api.putMultipart(
+      '/api/me/face',
+      fields: {'consent': 'true'},
+      files: [UploadFile('file', jpeg, filename: 'face.jpg', contentType: 'image/jpeg')],
+    ) as Map<String, dynamic>,
+  );
+
+  /// Deletes the photo; the client is removed from the turnstile.
+  Future<FaceAccess> deleteFace() async =>
+      FaceAccess.fromJson(await _api.delete('/api/me/face') as Map<String, dynamic>);
 
   Future<ClientProfile> profile() async =>
       ClientProfile.fromJson(await _api.get('/api/me/profile') as Map<String, dynamic>);
@@ -103,6 +163,9 @@ class ClientRepository {
     TrainingSession.fromJson,
   );
 }
+
+String _day(DateTime d) =>
+    '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 
 class NotificationRepository {
   NotificationRepository(this._api);

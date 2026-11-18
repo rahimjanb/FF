@@ -45,7 +45,15 @@ public class AdminMembershipsController(AppDbContext db, MembershipService membe
         return CreatedAtAction(nameof(Get), new { id = dto.Id }, dto);
     }
 
-    /// <summary>Freeze, cancel, reactivate or correct dates.</summary>
+    /// <summary>Cancel, reactivate or correct dates. Freezing goes through <see cref="Freeze"/> so the end date moves.</summary>
     [HttpPut("{id:guid}")]
     public Task<MembershipDto> Update(Guid id, UpdateMembershipRequest req, CancellationToken ct) => memberships.UpdateAsync(id, req, ct);
+
+    /// <summary>Freezes the membership for the given days; its end date moves forward by the same number of days.</summary>
+    [HttpPost("{id:guid}/freeze")]
+    public Task<MembershipDto> Freeze(Guid id, FreezeMembershipRequest req, CancellationToken ct) => memberships.FreezeAsync(id, req, ct);
+
+    /// <summary>Ends the current or planned freeze today and takes the unused days back from the end date.</summary>
+    [HttpPost("{id:guid}/unfreeze")]
+    public Task<MembershipDto> Unfreeze(Guid id, CancellationToken ct) => memberships.UnfreezeAsync(id, ct);
 }

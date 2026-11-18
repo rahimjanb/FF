@@ -32,9 +32,10 @@ Future<void> waitFor(WidgetTester tester, bool Function() found, {int seconds = 
 Future<void> pause(WidgetTester tester) => settle(tester, pauseSeconds);
 
 Future<void> login(WidgetTester tester, String phone, String password) async {
-  await tester.enterText(find.byType(TextFormField).at(0), phone);
-  await tester.enterText(find.byType(TextFormField).at(1), password);
-  await tester.tap(find.widgetWithText(FilledButton, 'Войти'));
+  await tester.enterText(find.byKey(const Key('login-phone')), phone);
+  await tester.enterText(find.byKey(const Key('login-password')), password);
+  await tester.pump();
+  await tester.tap(find.byKey(const Key('login-submit')));
   await settle(tester, 4);
   if (find.text('Придумайте свой пароль').evaluate().isNotEmpty) {
     await tester.enterText(find.byType(TextFormField).at(0), password);

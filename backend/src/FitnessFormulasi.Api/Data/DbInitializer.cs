@@ -33,6 +33,7 @@ public static class DbInitializer
         }
 
         await CreateBootstrapAdminAsync(sp, config, db, logger, ct);
+        await FitnessFormulasi.Api.Features.Nutrition.NutritionSeeder.SeedAsync(db, logger, ct);
         if (sp.GetService<DevLogins>() is not null)
             await DevLogins.SeedAsync(sp, logger, ct);
     }

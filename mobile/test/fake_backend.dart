@@ -12,6 +12,9 @@ class FakeBackend {
   bool mustChangePassword = false;
   String password = 'Secret123';
 
+  /// Set by `POST /api/me/delete-account` with the right password; the account's sessions end with it.
+  bool accountDeleted = false;
+
   static Map<String, dynamic> user(String role, {bool mustChange = false}) => {
     'id': 'u1',
     'phone': '+998901234567',
@@ -59,6 +62,14 @@ class FakeBackend {
     'visitLimit': visitLimit,
     'price': price,
     'isActive': true,
+  };
+
+  static Map<String, dynamic> pass({String code = 'FF1TESTCODE', String? lastVisitAt}) => {
+    'code': code,
+    'expiresAt': '2026-10-28T10:01:00Z',
+    'refreshAt': '2026-10-28T10:00:30Z',
+    'refreshInSeconds': 20,
+    'lastVisitAt': lastVisitAt,
   };
 
   String role = 'Client';
@@ -116,6 +127,12 @@ class FakeBackend {
         'user': user(role),
       });
     }
+    if (req.url.path == '/api/me/delete-account') {
+      if (jsonDecode(req.body)['password'] != password) return problem(400, 'invalid_password');
+      accountDeleted = true;
+      loggedIn = false; // the server revokes every session of the deleted account
+      return http.Response('', 204);
+    }
     if (mustChangePassword && req.url.path != '/api/auth/me') return problem(403, 'password_change_required');
     calls.update(req.url.path, (n) => n + 1, ifAbsent: () => 1);
     final route = routes[req.url.path];
@@ -128,6 +145,8 @@ class FakeBackend {
       '/api/me/dashboard' => json(dashboard()),
       '/api/me/memberships' => json([membership()]),
       '/api/me/plans' => json([plan('p1', 'Gold 30')]),
+      '/api/me/membership-requests' => json(<Object>[]),
+      '/api/me/pass' => json(pass()),
       '/api/me/visits' => json({'items': <Object>[], 'page': 1, 'pageSize': 50, 'totalCount': 0, 'totalPages': 0}),
       _ => problem(404, 'not_found'),
     };

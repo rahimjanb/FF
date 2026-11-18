@@ -35,7 +35,7 @@ public class AdminReportsController(AppDbContext db, IClubClock clock, Membershi
         var dayEnd = clock.StartOfDayUtc(today.AddDays(1));
         var monthStart = clock.StartOfDayUtc(new DateOnly(today.Year, today.Month, 1));
         return new AdminDashboardDto(
-            await db.ClientProfiles.CountAsync(ct),
+            await db.ClientProfiles.CountAsync(c => c.User.Status != UserStatus.Deleted, ct),
             await db.ClientProfiles.CountAsync(c => c.CreatedAt >= monthStart, ct),
             await memberships.Filter(db.Memberships, MembershipFilter.Active).CountAsync(ct),
             await memberships.Filter(db.Memberships, MembershipFilter.ExpiringSoon).CountAsync(ct),

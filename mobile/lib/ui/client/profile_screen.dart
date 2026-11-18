@@ -7,6 +7,8 @@ import 'package:intl/intl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/api_client.dart';
+import '../../core/config.dart';
 import '../../core/validators.dart';
 import '../../data/models.dart';
 import '../../data/repositories.dart';
@@ -27,7 +29,8 @@ class _ProfileData {
 }
 
 /// Client profile in the Liquid Glass style. Personal data is read-only here and edited in [_EditProfileSheet].
-/// Photo, Face ID, notification settings, support and club rules have no backend yet and are shown disabled.
+/// Photo, Face ID, notification settings, support and club rules have no backend yet: they are shown disabled, and
+/// only when [AppConfig.showUpcoming].
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
@@ -108,6 +111,7 @@ class _ProfileContent extends StatelessWidget {
       p.gender != null,
     ].where((x) => x).length;
     Widget soon() => SoonBadge(t.soon);
+    final upcoming = AppConfig.showUpcoming;
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
       padding: EdgeInsets.fromLTRB(Brand.sidePadding, 8, Brand.sidePadding, _listBottom(context)),
@@ -222,18 +226,20 @@ class _ProfileContent extends StatelessWidget {
           dividerIndent: 64,
           children: [
             // Notification preferences and biometric sign-in have no backend or plugin yet.
-            _SettingRow(
-              icon: Icons.notifications_none_rounded,
-              color: const Color(0xFFFF6B6F),
-              label: t.notifications,
-              trailing: _DisabledSwitch(value: true, badge: soon()),
-            ),
-            _SettingRow(
-              icon: Icons.face_retouching_natural_rounded,
-              color: Brand.successText,
-              label: t.faceIdLogin,
-              trailing: _DisabledSwitch(value: false, badge: soon()),
-            ),
+            if (upcoming) ...[
+              _SettingRow(
+                icon: Icons.notifications_none_rounded,
+                color: const Color(0xFFFF6B6F),
+                label: t.notifications,
+                trailing: _DisabledSwitch(value: true, badge: soon()),
+              ),
+              _SettingRow(
+                icon: Icons.face_retouching_natural_rounded,
+                color: Brand.successText,
+                label: t.faceIdLogin,
+                trailing: _DisabledSwitch(value: false, badge: soon()),
+              ),
+            ],
             _SettingRow(
               icon: Icons.language_rounded,
               color: Brand.accent,
@@ -249,17 +255,29 @@ class _ProfileContent extends StatelessWidget {
               onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ChangePasswordScreen())),
             ),
             _SettingRow(
-              icon: Icons.chat_bubble_outline_rounded,
-              color: Brand.purple,
-              label: t.menuSupport,
-              trailing: soon(),
+              key: const Key('open-privacy-policy'),
+              icon: Icons.privacy_tip_outlined,
+              color: Brand.clock,
+              label: t.privacyPolicy,
+              trailing: Icon(Icons.open_in_new_rounded, color: Brand.textTertiary, size: 20),
+              onTap: () => openPrivacyPolicy(context),
             ),
-            _SettingRow(icon: Icons.description_outlined, color: Brand.trophy, label: t.menuRules, trailing: soon()),
+            if (upcoming) ...[
+              _SettingRow(
+                icon: Icons.chat_bubble_outline_rounded,
+                color: Brand.purple,
+                label: t.menuSupport,
+                trailing: soon(),
+              ),
+              _SettingRow(icon: Icons.description_outlined, color: Brand.trophy, label: t.menuRules, trailing: soon()),
+            ],
           ],
         ),
         const SizedBox(height: Brand.sectionGap + 4),
         _LogoutButton(onPressed: () => confirmLogout(context)),
-        const SizedBox(height: 18),
+        const SizedBox(height: 8),
+        _DeleteAccountButton(onPressed: () => _deleteAccount(context)),
+        const SizedBox(height: 10),
         const _VersionLabel(),
       ],
     );
@@ -305,7 +323,10 @@ class _ProfileCard extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
           child: Column(
             children: [
-              _Avatar(initials: _initials(p), onCamera: () => _snack(context, t.photoSoon)),
+              _Avatar(
+                initials: _initials(p),
+                onCamera: AppConfig.showUpcoming ? () => _snack(context, t.photoSoon) : null,
+              ),
               const SizedBox(height: 14),
               Text(
                 '${p.firstName} ${p.lastName}'.trim(),
@@ -394,9 +415,11 @@ class _ProfileCard extends StatelessWidget {
 }
 
 class _Avatar extends StatelessWidget {
-  const _Avatar({required this.initials, required this.onCamera});
+  const _Avatar({required this.initials, this.onCamera});
   final String initials;
-  final VoidCallback onCamera;
+
+  /// Null hides the camera button.
+  final VoidCallback? onCamera;
 
   @override
   Widget build(BuildContext context) => SizedBox.square(
@@ -434,32 +457,33 @@ class _Avatar extends StatelessWidget {
           ),
         ),
         // Photo upload for clients has no backend yet; the button explains that.
-        Positioned(
-          right: -4,
-          bottom: -4,
-          child: Tooltip(
-            message: AppLocalizations.of(context).changePhoto,
-            child: InkResponse(
-              onTap: onCamera,
-              radius: 24,
-              child: SizedBox.square(
-                dimension: 44,
-                child: Center(
-                  child: Container(
-                    width: 30,
-                    height: 30,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: Brand.buttonGradient,
-                      border: Border.all(color: Brand.background, width: 2.5),
+        if (onCamera != null)
+          Positioned(
+            right: -4,
+            bottom: -4,
+            child: Tooltip(
+              message: AppLocalizations.of(context).changePhoto,
+              child: InkResponse(
+                onTap: onCamera,
+                radius: 24,
+                child: SizedBox.square(
+                  dimension: 44,
+                  child: Center(
+                    child: Container(
+                      width: 30,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: Brand.buttonGradient,
+                        border: Border.all(color: Brand.background, width: 2.5),
+                      ),
+                      child: const Icon(Icons.photo_camera_outlined, size: 15, color: Colors.white),
                     ),
-                    child: const Icon(Icons.photo_camera_outlined, size: 15, color: Colors.white),
                   ),
                 ),
               ),
             ),
           ),
-        ),
       ],
     ),
   );
@@ -684,6 +708,182 @@ class _LogoutButton extends StatelessWidget {
   );
 }
 
+/// Quiet destructive link under «Выйти из аккаунта»: account deletion is required to be reachable in the app.
+class _DeleteAccountButton extends StatelessWidget {
+  const _DeleteAccountButton({required this.onPressed});
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) => Center(
+    child: TextButton(
+      key: const Key('profile-delete-account'),
+      onPressed: () {
+        HapticFeedback.lightImpact();
+        onPressed();
+      },
+      style: TextButton.styleFrom(foregroundColor: Brand.redText, minimumSize: const Size(44, 44)),
+      child: Text(
+        AppLocalizations.of(context).deleteAccount,
+        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+      ),
+    ),
+  );
+}
+
+/// Opens the deletion sheet. Once the account is deleted the app is back on the login screen with a confirmation.
+Future<void> _deleteAccount(BuildContext context) async {
+  final t = AppLocalizations.of(context);
+  // The app-wide messenger outlives the client screens, so the message appears on the login screen.
+  final messenger = ScaffoldMessenger.of(context);
+  final deleted = await showGlassSheet<bool>(context, builder: (_) => const _DeleteAccountSheet());
+  if (deleted != true) return;
+  messenger
+    ..hideCurrentSnackBar()
+    ..showSnackBar(SnackBar(behavior: SnackBarBehavior.floating, content: Text(t.accountDeleted)));
+}
+
+/// What deletion means, a password to confirm it, and a red «Удалить навсегда» that stays off until it is typed.
+class _DeleteAccountSheet extends StatefulWidget {
+  const _DeleteAccountSheet();
+
+  @override
+  State<_DeleteAccountSheet> createState() => _DeleteAccountSheetState();
+}
+
+class _DeleteAccountSheetState extends State<_DeleteAccountSheet> {
+  final _password = TextEditingController();
+  bool _obscure = true;
+  bool _busy = false;
+  String? _error;
+
+  @override
+  void dispose() {
+    _password.dispose();
+    super.dispose();
+  }
+
+  bool get _canSubmit => !_busy && _password.text.isNotEmpty;
+
+  Future<void> _submit() async {
+    final t = AppLocalizations.of(context);
+    final session = context.read<SessionController>();
+    final navigator = Navigator.of(context);
+    setState(() {
+      _busy = true;
+      _error = null;
+    });
+    try {
+      await session.deleteAccount(_password.text);
+      // The session is already signed out; close the sheet before the app switches to the login screen.
+      navigator.pop(true);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _busy = false;
+        _error = e is ApiException && e.code == 'invalid_password' ? t.deleteAccountWrongPassword : errorText(t, e);
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    Widget point(IconData icon, String text) => Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 18, color: Brand.textTertiary),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(text, style: TextStyle(color: Brand.textSecondary, fontSize: 14, height: 1.35)),
+          ),
+        ],
+      ),
+    );
+    return Padding(
+      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              t.deleteAccountTitle,
+              style: const TextStyle(
+                color: Brand.textPrimary,
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
+                letterSpacing: -0.4,
+              ),
+            ),
+            const SizedBox(height: 16),
+            point(Icons.person_off_outlined, t.deleteAccountPointData),
+            point(Icons.event_busy_outlined, t.deleteAccountPointMembership),
+            point(Icons.receipt_long_outlined, t.deleteAccountPointRecords),
+            point(Icons.warning_amber_rounded, t.deleteAccountPointFinal),
+            const SizedBox(height: 8),
+            TextField(
+              key: const Key('delete-account-password'),
+              controller: _password,
+              enabled: !_busy,
+              obscureText: _obscure,
+              autocorrect: false,
+              enableSuggestions: false,
+              autofillHints: const [AutofillHints.password],
+              cursorColor: Brand.accent,
+              onChanged: (_) => setState(() => _error = null),
+              onSubmitted: (_) {
+                if (_canSubmit) _submit();
+              },
+              decoration: _decoration(
+                t.deleteAccountPasswordLabel,
+                error: _error,
+                suffix: IconButton(
+                  tooltip: _obscure ? t.showPassword : t.hidePassword,
+                  icon: Icon(
+                    _obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                    size: 20,
+                    color: Brand.textTertiary,
+                  ),
+                  onPressed: () => setState(() => _obscure = !_obscure),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              height: 52,
+              child: FilledButton(
+                key: const Key('delete-account-confirm'),
+                onPressed: _canSubmit ? _submit : null,
+                style: FilledButton.styleFrom(
+                  backgroundColor: Brand.red,
+                  foregroundColor: Colors.white,
+                  disabledBackgroundColor: Brand.red.withValues(alpha: 0.22),
+                  disabledForegroundColor: Colors.white.withValues(alpha: 0.5),
+                  shape: const StadiumBorder(),
+                ),
+                child: _busy
+                    ? const SizedBox.square(
+                        dimension: 22,
+                        child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
+                      )
+                    : Text(t.deleteAccountConfirm, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+              ),
+            ),
+            const SizedBox(height: 6),
+            TextButton(
+              onPressed: _busy ? null : () => Navigator.of(context).pop(false),
+              style: TextButton.styleFrom(foregroundColor: Brand.textSecondary, minimumSize: const Size(44, 48)),
+              child: Text(t.cancel, style: const TextStyle(fontSize: 16)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _VersionLabel extends StatelessWidget {
   const _VersionLabel();
 
@@ -757,6 +957,37 @@ class _LanguageSheet extends StatelessWidget {
     );
   }
 }
+
+/// Text field decoration of the profile sheets: dark glass fill, accent focus ring.
+InputDecoration _decoration(String label, {String? error, Widget? suffix}) => InputDecoration(
+  labelText: label,
+  errorText: error,
+  suffixIcon: suffix,
+  filled: true,
+  fillColor: Colors.white.withValues(alpha: 0.06),
+  labelStyle: TextStyle(color: Brand.textTertiary),
+  floatingLabelStyle: const TextStyle(color: Brand.accent),
+  enabledBorder: OutlineInputBorder(
+    borderRadius: BorderRadius.circular(14),
+    borderSide: BorderSide(color: Brand.glassStroke),
+  ),
+  focusedBorder: OutlineInputBorder(
+    borderRadius: BorderRadius.circular(14),
+    borderSide: const BorderSide(color: Brand.accent, width: 1.5),
+  ),
+  disabledBorder: OutlineInputBorder(
+    borderRadius: BorderRadius.circular(14),
+    borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.06)),
+  ),
+  errorBorder: OutlineInputBorder(
+    borderRadius: BorderRadius.circular(14),
+    borderSide: const BorderSide(color: Brand.redText),
+  ),
+  focusedErrorBorder: OutlineInputBorder(
+    borderRadius: BorderRadius.circular(14),
+    borderSide: const BorderSide(color: Brand.redText, width: 1.5),
+  ),
+);
 
 /// Edit sheet: Cancel | Редактирование | Done. Done is enabled only with valid changes; it pops `true` once saved.
 class _EditProfileSheet extends StatefulWidget {
@@ -856,28 +1087,6 @@ class _EditProfileSheetState extends State<_EditProfileSheet> {
       }
     }
   }
-
-  InputDecoration _decoration(String label, {String? error, Widget? suffix}) => InputDecoration(
-    labelText: label,
-    errorText: error,
-    suffixIcon: suffix,
-    filled: true,
-    fillColor: Colors.white.withValues(alpha: 0.06),
-    labelStyle: TextStyle(color: Brand.textTertiary),
-    floatingLabelStyle: const TextStyle(color: Brand.accent),
-    enabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(14),
-      borderSide: BorderSide(color: Brand.glassStroke),
-    ),
-    focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(14),
-      borderSide: const BorderSide(color: Brand.accent, width: 1.5),
-    ),
-    disabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(14),
-      borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.06)),
-    ),
-  );
 
   @override
   Widget build(BuildContext context) {

@@ -18,6 +18,10 @@ public class AdminCreateTrainerRequest
     [StringLength(128)] public string? Specialization { get; set; }
     [StringLength(2000)] public string? Bio { get; set; }
     [Range(0, 80)] public int? ExperienceYears { get; set; }
+    /// <summary>Username, @username or a t.me link.</summary>
+    [StringLength(64)] public string? Telegram { get; set; }
+    /// <summary>Username, @username or an instagram.com link.</summary>
+    [StringLength(128)] public string? Instagram { get; set; }
 }
 
 public class AdminUpdateTrainerRequest
@@ -28,6 +32,8 @@ public class AdminUpdateTrainerRequest
     [StringLength(128)] public string? Specialization { get; set; }
     [StringLength(2000)] public string? Bio { get; set; }
     [Range(0, 80)] public int? ExperienceYears { get; set; }
+    [StringLength(64)] public string? Telegram { get; set; }
+    [StringLength(128)] public string? Instagram { get; set; }
     public bool IsAcceptingClients { get; set; }
     public bool IsActive { get; set; }
     public UserStatus Status { get; set; }
@@ -61,6 +67,7 @@ public class AdminTrainersController(AppDbContext db, AuthService auth, TokenSer
     public async Task<ActionResult<TrainerAdminDto>> Create(AdminCreateTrainerRequest req, CancellationToken ct)
     {
         var phone = PhoneNumber.Normalize(req.Phone)!;
+        var (telegram, instagram) = (SocialHandles.Telegram(req.Telegram), SocialHandles.Instagram(req.Instagram));
         if (await db.Users.AnyAsync(u => u.Phone == phone, ct))
             throw ApiException.Conflict("phone_taken", "A user with this phone number already exists.");
         var user = await auth.CreateUserAsync(phone, req.Password, req.FirstName, req.LastName, RoleNames.Trainer, ct, assignedByStaff: true);
@@ -70,6 +77,8 @@ public class AdminTrainersController(AppDbContext db, AuthService auth, TokenSer
             Specialization = AdminClientsController.Clean(req.Specialization),
             Bio = AdminClientsController.Clean(req.Bio),
             ExperienceYears = req.ExperienceYears,
+            Telegram = telegram,
+            Instagram = instagram,
         };
         db.TrainerProfiles.Add(trainer);
         await db.SaveChangesAsync(ct);
@@ -81,6 +90,7 @@ public class AdminTrainersController(AppDbContext db, AuthService auth, TokenSer
     {
         var trainer = await db.TrainerProfiles.Include(t => t.User).SingleOrDefaultAsync(t => t.Id == id, ct) ?? throw ApiException.NotFound("Trainer");
         var phone = PhoneNumber.Normalize(req.Phone)!;
+        var (telegram, instagram) = (SocialHandles.Telegram(req.Telegram), SocialHandles.Instagram(req.Instagram));
         if (phone != trainer.User.Phone)
         {
             if (await db.Users.AnyAsync(u => u.Phone == phone, ct))
@@ -93,6 +103,8 @@ public class AdminTrainersController(AppDbContext db, AuthService auth, TokenSer
         trainer.Specialization = AdminClientsController.Clean(req.Specialization);
         trainer.Bio = AdminClientsController.Clean(req.Bio);
         trainer.ExperienceYears = req.ExperienceYears;
+        trainer.Telegram = telegram;
+        trainer.Instagram = instagram;
         trainer.IsAcceptingClients = req.IsAcceptingClients;
         trainer.IsActive = req.IsActive;
         var blocked = trainer.User.Status != UserStatus.Blocked && req.Status == UserStatus.Blocked;

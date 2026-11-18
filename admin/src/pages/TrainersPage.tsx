@@ -60,6 +60,7 @@ function TrainerModal({ trainer, onClose, onSaved, onPhotoChanged }: {
   const [form, setForm] = useState({
     phone: trainer?.phone ?? '', password: '', firstName: trainer?.firstName ?? '', lastName: trainer?.lastName ?? '',
     specialization: trainer?.specialization ?? '', bio: trainer?.bio ?? '', experienceYears: String(trainer?.experienceYears ?? ''),
+    telegram: trainer?.telegram ? `@${trainer.telegram}` : '', instagram: trainer?.instagram ? `@${trainer.instagram}` : '',
     isAcceptingClients: trainer?.isAcceptingClients ?? true, isActive: trainer?.isActive ?? true,
     status: trainer?.userStatus ?? ('Active' as UserStatus),
   })
@@ -75,6 +76,7 @@ function TrainerModal({ trainer, onClose, onSaved, onPhotoChanged }: {
     const common = {
       phone: form.phone, firstName: form.firstName, lastName: form.lastName, specialization: form.specialization || null,
       bio: form.bio || null, experienceYears: form.experienceYears === '' ? null : Number(form.experienceYears),
+      telegram: form.telegram || null, instagram: form.instagram || null,
     }
     try {
       if (trainer) {
@@ -107,6 +109,15 @@ function TrainerModal({ trainer, onClose, onSaved, onPhotoChanged }: {
           <Field label="Опыт, лет" error={errors.experienceYears}><input type="number" min={0} max={80} value={form.experienceYears} onChange={set('experienceYears')} /></Field>
         </div>
         <Field label="О тренере" error={errors.bio}><textarea value={form.bio} onChange={set('bio')} rows={3} maxLength={2000} /></Field>
+        <div className="grid-2">
+          <Field label="Telegram" error={errors.telegram} hint="Ник или ссылка t.me">
+            <input value={form.telegram} onChange={set('telegram')} placeholder="@username" maxLength={64} />
+          </Field>
+          <Field label="Instagram" error={errors.instagram} hint="Ник или ссылка на профиль">
+            <input value={form.instagram} onChange={set('instagram')} placeholder="@username" maxLength={128} />
+          </Field>
+        </div>
+        <p className="field-hint">Клиент увидит Telegram и Instagram тренера после того, как отправит ему заявку.</p>
         {trainer && (
           <>
             <label className="check"><input type="checkbox" checked={form.isAcceptingClients} onChange={e => setForm({ ...form, isAcceptingClients: e.target.checked })} /> Принимает новых клиентов</label>

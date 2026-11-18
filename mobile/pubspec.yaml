@@ -41,11 +41,22 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   package_info_plus: ^10.2.2
+  local_auth: ^3.0.2
+  qr_flutter: ^4.1.0
+  video_player: ^2.14.1
+  url_launcher: ^6.3.3
+  image_picker: ^1.2.4
+  image: ^4.12.0
+  http_parser: ^4.1.2
+  mobile_scanner: ^7.5.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   integration_test:
+    sdk: flutter
+  # Host side of the store screenshot run (test_driver/screenshots.dart).
+  flutter_driver:
     sdk: flutter
 
   # The "flutter_lints" package below contains a set of recommended lints to

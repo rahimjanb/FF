@@ -55,6 +55,9 @@ class Brand {
   static const glowCyan = Color(0xFF19C6E6);
   static const glowRoyal = Color(0xFF2B6BFF);
   static const purple = Color(0xFFB48CFF);
+  static const warning = Color(0xFFFF9F0A);
+  static const warningIcon = Color(0xFFFFB340);
+  static const warningText = Color(0xFFFFC56B);
   static const success = Color(0xFF34D399);
   static const successText = Color(0xFF4ADE80);
 

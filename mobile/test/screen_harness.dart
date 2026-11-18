@@ -1,10 +1,12 @@
 import 'package:fitness_formulasi/core/api_client.dart';
 import 'package:fitness_formulasi/core/token_storage.dart';
+import 'package:fitness_formulasi/data/nutrition_repository.dart';
 import 'package:fitness_formulasi/data/repositories.dart';
 import 'package:fitness_formulasi/l10n/gen/app_localizations.dart';
 import 'package:fitness_formulasi/state/locale_controller.dart';
 import 'package:fitness_formulasi/ui/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
@@ -34,6 +36,7 @@ Future<FakeBackend> pumpScreen(
         Provider.value(value: ClientRepository(api)),
         Provider.value(value: TrainerRepository(api)),
         Provider.value(value: NotificationRepository(api)),
+        Provider.value(value: NutritionRepository(api)),
       ],
       child: MaterialApp(
         theme: buildDarkTheme(),
@@ -107,3 +110,16 @@ Map<String, dynamic> profileJson({bool withTrainer = true}) => {
   'gender': null,
   'assignedTrainer': withTrainer ? trainerJson() : null,
 };
+
+/// URLs the app opens with url_launcher during the test (its default method channel answers «opened»).
+List<String> captureLaunchedUrls(WidgetTester tester) {
+  const channel = MethodChannel('plugins.flutter.io/url_launcher');
+  final messenger = tester.binding.defaultBinaryMessenger;
+  final urls = <String>[];
+  messenger.setMockMethodCallHandler(channel, (call) async {
+    if (call.method == 'launch') urls.add((call.arguments as Map)['url'] as String);
+    return true;
+  });
+  addTearDown(() => messenger.setMockMethodCallHandler(channel, null));
+  return urls;
+}

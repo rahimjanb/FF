@@ -23,7 +23,8 @@ public class Role
     public ICollection<User> Users { get; set; } = [];
 }
 
-public enum UserStatus { Active, Blocked }
+/// <summary>Deleted: a client erased their account (or the club did on their request); see <c>AccountDeletionService</c>. Final.</summary>
+public enum UserStatus { Active, Blocked, Deleted }
 
 public class User : Entity
 {
@@ -45,6 +46,8 @@ public class User : Entity
     public int AccessFailedCount { get; set; }
     public DateTimeOffset? LockoutEnd { get; set; }
     public DateTimeOffset? LastLoginAt { get; set; }
+    /// <summary>When the account was deleted; personal data is gone, the record stays for memberships and visits.</summary>
+    public DateTimeOffset? DeletedAt { get; set; }
 
     public int RoleId { get; set; }
     public Role Role { get; set; } = null!;
@@ -91,6 +94,10 @@ public class ClientProfile : Entity
 
     public Guid? AssignedTrainerId { get; set; }
     public TrainerProfile? AssignedTrainer { get; set; }
+    /// <summary>The client chose to train on their own. Cleared when a trainer is assigned.</summary>
+    public bool WithoutTrainer { get; set; }
+    /// <summary>Person number on the face recognition terminals, assigned with the first face photo (sequence from 1001).</summary>
+    public int? AccessNo { get; set; }
 
     public ICollection<Membership> Memberships { get; set; } = [];
     public ICollection<Visit> Visits { get; set; } = [];
@@ -107,6 +114,10 @@ public class TrainerProfile : Entity
     public bool IsActive { get; set; } = true;
     /// <summary>Bumped on every photo change; 0 means no photo. Part of the photo URL so clients can cache it.</summary>
     public int PhotoVersion { get; set; }
+    /// <summary>Telegram username without "@". A client sees it after sending a request to the trainer.</summary>
+    public string? Telegram { get; set; }
+    /// <summary>Instagram username without "@". A client sees it after sending a request to the trainer.</summary>
+    public string? Instagram { get; set; }
 
     public ICollection<ClientProfile> Clients { get; set; } = [];
 }
@@ -158,6 +169,48 @@ public class Membership : Entity
     public uint Version { get; set; }
 
     public ICollection<Visit> Visits { get; set; } = [];
+    public ICollection<MembershipFreeze> Freezes { get; set; } = [];
+}
+
+/// <summary>
+/// Freeze period set by the client in the app or by staff (club-local dates, inclusive). The membership EndDate is
+/// moved forward by its length when it is created and back by the unused days when it is ended early. At most one
+/// freeze per membership may be current or upcoming, so the latest one describes the freeze state. Every row counts
+/// towards the freeze limit (see MembershipService.FreezesAllowed); a planned freeze cancelled before it started is deleted.
+/// </summary>
+public class MembershipFreeze : Entity
+{
+    public Guid MembershipId { get; set; }
+    public Membership Membership { get; set; } = null!;
+    public DateOnly StartDate { get; set; }
+    public DateOnly EndDate { get; set; }
+    public Guid? CreatedByUserId { get; set; }
+}
+
+/// <summary>New = the client has no membership yet; Renew = the same plan after the current one; Change = another plan.</summary>
+public enum MembershipRequestKind { New, Renew, Change }
+
+public enum MembershipRequestStatus { Pending, Completed, Rejected, Cancelled }
+
+/// <summary>
+/// A client asks for a membership from the app; staff take the payment at the desk and complete the request,
+/// which assigns the membership. Online payment is stage 2.
+/// </summary>
+public class MembershipRequest : Entity
+{
+    public Guid ClientProfileId { get; set; }
+    public ClientProfile ClientProfile { get; set; } = null!;
+    public Guid MembershipPlanId { get; set; }
+    public MembershipPlan Plan { get; set; } = null!;
+    public MembershipRequestKind Kind { get; set; }
+    public MembershipRequestStatus Status { get; set; } = MembershipRequestStatus.Pending;
+    public string? ResponseComment { get; set; }
+    public DateTimeOffset? RespondedAt { get; set; }
+    public Guid? RespondedByUserId { get; set; }
+    /// <summary>The membership assigned when the request was completed.</summary>
+    public Guid? MembershipId { get; set; }
+    /// <summary>Optimistic concurrency token (PostgreSQL xmin).</summary>
+    public uint Version { get; set; }
 }
 
 public enum TrainerRequestStatus { Pending, Accepted, Rejected, Cancelled }
@@ -191,8 +244,8 @@ public class TrainingSession : Entity
     public string? Notes { get; set; }
 }
 
-/// <summary>Stage 1 source is manual entry by staff; turnstile integration comes in stage 2.</summary>
-public enum VisitSource { Manual }
+/// <summary>Manual entry by staff, the client's QR pass scanned at the desk, or a pass through the face recognition terminal.</summary>
+public enum VisitSource { Manual, QrScan, FaceTerminal }
 
 public class Visit : Entity
 {
@@ -205,7 +258,40 @@ public class Visit : Entity
     public Guid? RecordedByUserId { get; set; }
 }
 
-public enum NotificationType { TrainerRequestReceived, TrainerRequestAccepted, TrainerRequestRejected, TrainingSessionScheduled, TrainingSessionCancelled, MembershipAssigned }
+public enum NotificationType
+{
+    TrainerRequestReceived, TrainerRequestAccepted, TrainerRequestRejected, TrainingSessionScheduled, TrainingSessionCancelled,
+    MembershipAssigned, MembershipFrozen, MembershipUnfrozen, MembershipRequestRejected,
+}
+
+/// <summary>Promo banner at the top of the client app home screen; tapping it opens the title, text and media.</summary>
+public class Banner : Entity
+{
+    public required string Title { get; set; }
+    public string? Description { get; set; }
+    /// <summary>Hidden banners stay in the admin panel but are not shown in the app.</summary>
+    public bool IsActive { get; set; } = true;
+    /// <summary>Position in the app carousel, ascending.</summary>
+    public int SortOrder { get; set; }
+
+    public ICollection<BannerMedia> Media { get; set; } = [];
+}
+
+public enum BannerMediaKind { Image, Video }
+
+/// <summary>
+/// Photo or video of a banner, in display order; the first photo is the banner cover. The file itself is kept
+/// by <c>MediaStorage</c> under the media id, not in the database.
+/// </summary>
+public class BannerMedia : Entity
+{
+    public Guid BannerId { get; set; }
+    public Banner Banner { get; set; } = null!;
+    public BannerMediaKind Kind { get; set; }
+    public required string ContentType { get; set; }
+    public long SizeBytes { get; set; }
+    public int SortOrder { get; set; }
+}
 
 /// <summary>In-app notification. Text is localized by the client app from Type and Payload.</summary>
 public class Notification : Entity

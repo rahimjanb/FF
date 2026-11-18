@@ -32,20 +32,10 @@ class _ClientShellState extends State<ClientShell> {
     final pages = [
       HomeScreen(key: ValueKey('home$_generation'), onNavigate: _go),
       MembershipScreen(key: ValueKey('membership$_generation')),
-      TrainersScreen(key: ValueKey('trainers$_generation')),
+      TrainersScreen(key: ValueKey('trainers$_generation'), onNavigate: _go),
       WorkoutsScreen(key: ValueKey('workouts$_generation'), onNavigate: _go),
       const ProfileScreen(),
     ];
-    final bottomInset = MediaQuery.paddingOf(context).bottom;
-    // Home, Membership and Profile scroll under the floating tab bar and pad themselves;
-    // other tabs get the space reserved below them.
-    const underBar = {0, 1, 4};
-    Widget page(int i) => underBar.contains(i)
-        ? pages[i]
-        : Padding(
-            padding: EdgeInsets.only(bottom: Brand.tabBarReserve + bottomInset),
-            child: MediaQuery.removePadding(context: context, removeBottom: true, child: pages[i]),
-          );
     // Android Back on another tab returns to Home first; only Back on Home leaves the app.
     return PopScope(
       canPop: _index == 0,
@@ -55,7 +45,8 @@ class _ClientShellState extends State<ClientShell> {
       child: Scaffold(
         backgroundColor: Brand.background,
         extendBody: true,
-        body: IndexedStack(index: _index, children: [for (var i = 0; i < pages.length; i++) page(i)]),
+        // Every tab scrolls under the floating tab bar and pads itself.
+        body: IndexedStack(index: _index, children: pages),
         bottomNavigationBar: GlassTabBar(
           index: _index,
           onSelected: _go,

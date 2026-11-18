@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router'
 import { api, qs } from '../api/client'
 import type { Client, Paged, UserStatus } from '../api/types'
 import { Badge, Button, DataState, Field, Modal, PageHeader, Pagination, ErrorBanner } from '../components/ui'
-import { fmtDate, fullName, membershipStatusLabel, membershipStatusTone, userStatusLabel } from '../lib/format'
+import { displayPhone, fmtDate, fullName, membershipStatusLabel, membershipStatusTone, userStatusLabel, userStatusTone } from '../lib/format'
 import { errorMessage, fieldErrors, useAsync } from '../lib/useAsync'
 
 export function ClientsPage() {
@@ -23,9 +23,10 @@ export function ClientsPage() {
       <form className="filters" onSubmit={e => { e.preventDefault(); setPage(1); setQuery(search.trim()) }}>
         <input placeholder="Имя, фамилия или телефон" value={search} onChange={e => setSearch(e.target.value)} />
         <select value={status} onChange={e => { setPage(1); setStatus(e.target.value as UserStatus | '') }}>
-          <option value="">Любой статус</option>
+          <option value="">Все, кроме удалённых</option>
           <option value="Active">Активные</option>
           <option value="Blocked">Заблокированные</option>
+          <option value="Deleted">Удалённые</option>
         </select>
         <select value={hasActive} onChange={e => { setPage(1); setHasActive(e.target.value as '' | 'true' | 'false') }}>
           <option value="">Все абонементы</option>
@@ -43,12 +44,12 @@ export function ClientsPage() {
                 {data.items.map(c => (
                   <tr key={c.id}>
                     <td><Link to={`/clients/${c.id}`}>{fullName(c)}</Link></td>
-                    <td>{c.phone}</td>
+                    <td>{displayPhone(c.phone)}</td>
                     <td>{c.currentMembership
                       ? <><Badge tone={membershipStatusTone[c.currentMembership.effectiveStatus]}>{membershipStatusLabel[c.currentMembership.effectiveStatus]}</Badge> <span className="muted">до {fmtDate(c.currentMembership.endDate)}</span></>
                       : <span className="muted">нет</span>}</td>
                     <td>{c.assignedTrainer ? fullName(c.assignedTrainer) : <span className="muted">—</span>}</td>
-                    <td><Badge tone={c.status === 'Active' ? 'green' : 'red'}>{userStatusLabel[c.status]}</Badge></td>
+                    <td><Badge tone={userStatusTone[c.status]}>{userStatusLabel[c.status]}</Badge></td>
                     <td>{fmtDate(c.createdAt)}</td>
                   </tr>
                 ))}

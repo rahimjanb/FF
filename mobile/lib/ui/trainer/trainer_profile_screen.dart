@@ -122,7 +122,16 @@ class _TrainerProfileFormState extends State<_TrainerProfileForm> {
         ),
         SectionTitle(t.language),
         const Align(alignment: Alignment.centerLeft, child: LanguageSwitch()),
-        const SizedBox(height: 28),
+        const SizedBox(height: 12),
+        ListTile(
+          key: const Key('open-privacy-policy'),
+          contentPadding: EdgeInsets.zero,
+          leading: const Icon(Icons.privacy_tip_outlined),
+          title: Text(t.privacyPolicy),
+          trailing: const Icon(Icons.open_in_new_rounded, size: 20),
+          onTap: () => openPrivacyPolicy(context),
+        ),
+        const SizedBox(height: 16),
         OutlinedButton.icon(
           key: const Key('profile-logout'),
           onPressed: () => confirmLogout(context),

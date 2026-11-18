@@ -5,6 +5,7 @@ import 'app.dart';
 import 'core/api_client.dart';
 import 'core/config.dart';
 import 'core/token_storage.dart';
+import 'data/nutrition_repository.dart';
 import 'data/repositories.dart';
 import 'state/locale_controller.dart';
 import 'state/session.dart';
@@ -25,6 +26,7 @@ Future<void> main() async {
         Provider.value(value: ClientRepository(api)),
         Provider.value(value: TrainerRepository(api)),
         Provider.value(value: NotificationRepository(api)),
+        Provider.value(value: NutritionRepository(api)),
       ],
       child: const FitnessApp(),
     ),

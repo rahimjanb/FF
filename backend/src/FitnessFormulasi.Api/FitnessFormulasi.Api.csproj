@@ -11,6 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Anthropic" Version="13.10.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.13" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.13">
       <PrivateAssets>all</PrivateAssets>
@@ -19,6 +20,13 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.13" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Public legal pages (Features/Legal/LegalController.cs). -->
+    <EmbeddedResource Include="Features\Legal\*.html" LogicalName="legal/%(Filename)%(Extension)" />
+    <!-- Built-in food database: USDA values and Uzbek dish recipes (backend/tools/nutrition-data). -->
+    <EmbeddedResource Include="Features\Nutrition\Data\*.json" LogicalName="nutrition/%(Filename)%(Extension)" />
   </ItemGroup>
 
 </Project>
